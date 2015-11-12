@@ -1,0 +1,7 @@
+nbproject/build-impl.xml
+*.xml
+nbproject/private/private.properties
+*.xml
+nbproject/jnlp-impl.xml
+*.properties
+nbproject/private/private.properties

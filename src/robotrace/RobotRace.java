@@ -2,6 +2,7 @@ package robotrace;
 
 import javax.media.opengl.GL;
 import static javax.media.opengl.GL2.*;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 
 /**
  * Handles all of the RobotRace graphics functionality,
@@ -75,7 +76,6 @@ public class RobotRace extends Base {
      * camera, track, and terrain.
      */
     public RobotRace() {
-        
         // Create a new array of four robots
         robots = new Robot[4];
         
@@ -137,7 +137,11 @@ public class RobotRace extends Base {
      */
     @Override
     public void initialize() {
-		
+        //Lighting
+        gl.glEnable(GL_LIGHTING);
+        gl.glEnable(GL_COLOR_MATERIAL);
+        gl.glEnable(GL_LIGHT0);
+        
         // Enable blending.
         gl.glEnable(GL_BLEND);
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -146,7 +150,7 @@ public class RobotRace extends Base {
         gl.glEnable(GL_DEPTH_TEST);
         gl.glDepthFunc(GL_LESS);
 		
-	    // Normalize normals.
+	// Normalize normals.
         gl.glEnable(GL_NORMALIZE);
         
         // Enable textures. 
@@ -181,7 +185,9 @@ public class RobotRace extends Base {
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
-               
+        
+        // Set light position
+        
         // Update the view according to the camera mode and robot of interest.
         // For camera modes 1 to 4, determine which robot to focus on.
         camera.update(gs, robots[0]);
