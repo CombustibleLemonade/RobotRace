@@ -27,12 +27,52 @@ class Robot {
 
         // code goes here ...
     }
+    /**
+     * draws an arm
+     * @param tAnim animation position 
+     */
+    public void drawArm(GL2 gl, GLU glu, GLUT glut, float tAnim){
+        gl.glPushMatrix();
 
+        gl.glTranslatef(0.5f, 0.0f, -0.4f); // Translate them outside of the body
+        gl.glRotatef(-10.0f, 0.0f, 1.0f, 0.0f); // Make arms point slightly outwards
+        gl.glScalef(0.2f, 0.2f, 0.9f); // Scale the cubes to become long
+        glut.glutSolidCube(1.0f);
+        gl.glPopMatrix();
+    }
+    
     /**
      * Draws this robot (as a {@code stickfigure} if specified).
      */
     public void draw(GL2 gl, GLU glu, GLUT glut, boolean stickFigure, float tAnim) {
-        gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-        glut.glutSolidTeapot(0.3);
+        gl.glPushMatrix();
+        
+        // Head
+        gl.glPushMatrix();
+        gl.glColor3f(0.6f, 0.6f, 0.6f);
+        
+        gl.glTranslatef(0.0f, 0.0f, 1.87f);
+        gl.glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+        gl.glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+
+        glut.glutSolidTeapot(0.2);
+        gl.glPopMatrix();
+        
+        //Torso
+        gl.glPushMatrix();
+        gl.glTranslatef(0.0f, 0.0f, 1.25f);
+        gl.glScalef(0.616f, 0.426f, 0.93f);
+        glut.glutSolidCube(1.0f);
+        gl.glPopMatrix();
+        
+        // Arms
+        gl.glPushMatrix();
+        gl.glTranslatef(0.0f, 0.0f, 1.6f);
+        drawArm(gl, glu, glut, tAnim);
+        gl.glScalef(-1.0f, 1.0f, 1.0f);
+        drawArm(gl, glu, glut, tAnim);
+        gl.glPopMatrix();
+        
+        gl.glPopMatrix();
     }
 }
