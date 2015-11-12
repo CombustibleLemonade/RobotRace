@@ -32,6 +32,7 @@ class Robot {
      * Draws this robot (as a {@code stickfigure} if specified).
      */
     public void draw(GL2 gl, GLU glu, GLUT glut, boolean stickFigure, float tAnim) {
-        // code goes here ...
+        gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+        glut.glutSolidTeapot(0.3);
     }
 }

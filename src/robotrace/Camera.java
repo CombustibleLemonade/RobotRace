@@ -53,9 +53,9 @@ class Camera {
      */
     private void setDefaultMode(GlobalState gs) {
         center = gs.cnt;
-        eye.x = Math.cos(gs.theta)*Math.cos(gs.phi) * gs.vDist;
-        eye.y = Math.sin(gs.theta)*Math.cos(gs.phi) * gs.vDist;
-        eye.z = Math.sin(gs.phi) * gs.vDist;
+        eye.x = Math.cos(gs.theta)*Math.cos(gs.phi) * gs.vDist + center.x;
+        eye.y = Math.sin(gs.theta)*Math.cos(gs.phi) * gs.vDist + center.y;
+        eye.z = Math.sin(gs.phi) * gs.vDist + center.z;
     }
 
     /**
