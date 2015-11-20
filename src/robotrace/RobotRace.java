@@ -179,9 +179,12 @@ public class RobotRace extends Base {
 
         // Set the perspective.
         // Modify this to meet the requirements in the assignment.
-        glu.gluPerspective(gs.vDist * gs.vWidth * (float)gs.h / (float)gs.w, (float)gs.w / (float)gs.h, gs.vDist*0.1, gs.vDist*10.0);
-        // System.out.println(gs.vWidth);
+        double vHeight = gs.vWidth * ((float)gs.h / (float)gs.w ); // Get the viewing height at vDist
+        vHeight *= 1.1; // Correction for the top bar
+        double fovy = 2.0 * Math.toDegrees(Math.atan(vHeight/gs.vDist)); // Compute the fov angle from that
         
+        glu.gluPerspective(fovy, (float)gs.w / (float)gs.h, gs.vDist*0.1, gs.vDist*10.0);
+
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
@@ -253,11 +256,14 @@ public class RobotRace extends Base {
      * Draws a single axis
      */
     public void drawAxis(){
-            gl.glTranslatef(0.0f, 0.0f, 0.8f);
-            glut.glutSolidCone(0.1f, 0.3f, 10, 10);
-            gl.glTranslatef(0.0f, 0.0f, -0.4f);
-            gl.glScalef(0.08f, 0.08f, 1.0f);
-            glut.glutSolidCube(0.8f);
+        int circleSegments = 40;
+        
+        gl.glTranslatef(0.0f, 0.0f, 0.8f);
+        glut.glutSolidCone(0.1f, 0.3f, circleSegments, 2);
+        glut.glutSolidCylinder(0.1f, 0.0f, circleSegments, 1); // Fill the end
+        gl.glTranslatef(0.0f, 0.0f, -0.4f);
+        gl.glScalef(0.08f, 0.08f, 1.0f);
+        glut.glutSolidCube(0.8f);
     }
     
     /**
@@ -267,7 +273,7 @@ public class RobotRace extends Base {
     public void drawAxisFrame() {
         if(gs.showAxes){
             gl.glColor3f(0.9f, 0.9f, 0.0f);
-            glut.glutSolidSphere(0.15f, 10, 10);
+            glut.glutSolidSphere(0.15f, 40, 20);
             
             // X-axis
             gl.glColor3f(0.0f, 1.0f, 0.0f);

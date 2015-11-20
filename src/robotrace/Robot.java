@@ -1,7 +1,6 @@
 package robotrace;
 
 import com.jogamp.opengl.util.gl2.GLUT;
-import java.awt.Point;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
@@ -18,7 +17,10 @@ class Robot {
 
     /** The material from which this robot is built. */
     private final Material material;
-
+    
+    float upperLegLength;
+    float lowerLegLength;
+    
     /**
      * Constructs the robot with initial parameters.
      */
@@ -48,14 +50,31 @@ class Robot {
      * @param tAnim animation position 
      */
     public void drawLeg(GL2 gl, GLU glu, GLUT glut, float tAnim){
+        Vector hipPos;
+        hipPos = new Vector(0.0, 0.0, 1.0);
+        
         gl.glPushMatrix();
-        gl.glTranslatef(0.2f, 0.0f, -0.7f); // Translate them outside of the body
-        gl.glRotatef(-5, 0.0f, 1.0f, 0.0f); // Make legs point slightly outwards
-        gl.glTranslatef(0.0f, 0.0f, -0.25f); // Go down a bit
-        gl.glScalef(0.2f, 0.2f, 0.5f); // Scale the cubes to become long
+        
+        gl.glTranslatef((float)hipPos.x, (float)hipPos.y, (float)hipPos.z);
         glut.glutSolidCube(1.0f);
         gl.glPopMatrix();
     }
+    
+    /**
+     * Draws both legs
+     * @param gl
+     * @param glu
+     * @param glut
+     * @param tAnim 
+     */
+    public void drawLegs(GL2 gl, GLU glu, GLUT glut, float tAnim){
+        gl.glPushMatrix();
+        
+        drawLeg(gl, glu, glut, tAnim);
+        
+        gl.glPopMatrix();
+    }
+    
     
     /**
      * Draws this robot (as a {@code stickfigure} if specified).
@@ -91,30 +110,26 @@ class Robot {
         
         // Legs
         gl.glPushMatrix();
-        gl.glTranslatef(0.0f, 0.0f, 1.6f);
-        drawLeg(gl, glu, glut, tAnim);
-        gl.glScalef(-1.0f, 1.0f, 1.0f);
-        drawLeg(gl, glu, glut, tAnim);
+        drawLegs(gl, glu, glut, tAnim);
         gl.glPopMatrix();
         
-        gl.glPopMatrix();
-        
-        IKhelper test = new IKhelper(1.0f, 1.0f, new Vector2(1, 2));
+        IKhelper test = new IKhelper(1.0f, 2.0f, new Vector2(0.1f, 0.0f));
         test.compute();
-        // System.out.println(test.J1.y);
+        
+        gl.glPopMatrix();
     }
 }
 
 
 class IKhelper{
-    public float length1;
-    public float length2;
+    public double length1;
+    public double length2;
     public Vector2 target;
     
     public Vector2 J1 = new Vector2(); // Joint 1
     
-    public float rot1;
-    public float rot2;
+    public double rot1;
+    public double rot2;
     
     public IKhelper(float length1_arg, float length2_arg, Vector2 target_arg){
         length1 = length1_arg;
@@ -124,24 +139,33 @@ class IKhelper{
     
     public void compute(){
         /**
+         * See: http://mathworld.wolfram.com/Circle-CircleIntersection.html
          * J1 is the intersection of two circles a and b
          * A has radius length1, and is centered on the origin
          * B has radius length2, and is centered on target
          * Applying trigonometry on these constraints gives:
          */
-        double linConst;
-        linConst = Math.pow(length1, 2)-Math.pow(length2, 2)+Math.pow(target.x, 2)+Math.pow(target.y, 2) + 1.0;
-        linConst /= 2.0 * target.y;
+        double d = target.distance();
+        double x = (d*d-length2*length2+length1*length1)/(2.0*d);
         
-        double linFac = -(target.x/target.y);
-        System.out.println(linFac);
-
+        /**
+         * Circle obeys y=sqrt(length1^2-(x)^2)
+         * Therefore we can compute a by:
+         */
+        double y = 0;
+        double ySquared = length1*length1-x*x;
+        if (ySquared >= 0){
+            y = Math.sqrt(length1*length1-x*x);
+        } else {
+            x = length1;
+            d = length2;
+        }
     }
 }
 
 class Vector2{
-    public float x;
-    public float y;
+    public double x;
+    public double y;
     
     public Vector2(float x_arg, float y_arg){
         x = x_arg;
@@ -151,5 +175,9 @@ class Vector2{
     public Vector2(){
         x = 0;
         y = 0;
+    }
+    
+    public double distance(){
+        return Math.sqrt(x*x + y*y);
     }
 }
