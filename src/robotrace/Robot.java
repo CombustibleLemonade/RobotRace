@@ -18,8 +18,8 @@ class Robot {
     /** The material from which this robot is built. */
     private final Material material;
     
-    double upperLegLength = 0.8;
-    double lowerLegLength = 0.8;
+    double upperLegLength = 0.7;
+    double lowerLegLength = 0.75;
     
     /**
      * Converts a position into an angle and a distance
@@ -69,6 +69,8 @@ class Robot {
         IK = new IKhelper(upperLegLength, lowerLegLength, targetAD.y);
         IK.compute();
         
+        System.out.println(targetAD.x);
+
         gl.glRotated(180-targetAD.x, 1.0, 0.0, 0.0);
         gl.glRotated(IK.rot1, 1.0, 0.0, 0.0);
         
@@ -83,7 +85,6 @@ class Robot {
         gl.glTranslated(0, 0, -upperLegLength/2.0);
         
         gl.glRotated(IK.rot2, 1.0, 0.0, 0.0);
-        System.out.println(IK.rot2);
         
         /**
          * Draw upper leg
@@ -107,11 +108,15 @@ class Robot {
      */
     public void drawLegs(GL2 gl, GLU glu, GLUT glut, float tAnim){
         gl.glPushMatrix();
-        
-        gl.glTranslated(0.15, 0, 0.9);
-        drawLeg(gl, glu, glut, new Vector2(1, -1));
-        
+        gl.glTranslated(0.15, 0, 1.0);
+        drawLeg(gl, glu, glut, new Vector2(0.5 + 0.5 * Math.sin(tAnim * 3), -1));
         gl.glPopMatrix();
+        
+        /**
+        gl.glPushMatrix();
+        gl.glTranslated(-0.15, 0, 1.0);
+        drawLeg(gl, glu, glut, new Vector2(1, -1));
+        gl.glPopMatrix();*/
     }
     
     
@@ -201,7 +206,7 @@ class IKhelper{
             y = Math.sqrt(length1*length1-x*x);
         } else {
             x = length1;
-            d = length2;
+            d = length1 + length2;
         }
         
         /**
