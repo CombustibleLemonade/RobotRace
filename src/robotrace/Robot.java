@@ -18,8 +18,21 @@ class Robot {
     /** The material from which this robot is built. */
     private final Material material;
     
-    float upperLegLength;
-    float lowerLegLength;
+    double upperLegLength = 0.8;
+    double lowerLegLength = 0.8;
+    
+    /**
+     * Converts a position into an angle and a distance
+     * @param pos target position
+     * @return angle (x) and distance(y)
+     */
+    public static Vector2 posToAngleDist(Vector2 pos){
+        double distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
+        double angle;
+        angle = Math.toDegrees(Math.acos(pos.y / distance));
+
+        return new Vector2(angle, distance);
+    }
     
     /**
      * Constructs the robot with initial parameters.
@@ -49,14 +62,39 @@ class Robot {
      * draws a leg
      * @param tAnim animation position 
      */
-    public void drawLeg(GL2 gl, GLU glu, GLUT glut, float tAnim){
-        Vector hipPos;
-        hipPos = new Vector(0.0, 0.0, 1.0);
-        
+    public void drawLeg(GL2 gl, GLU glu, GLUT glut, Vector2 target){
         gl.glPushMatrix();
+        Vector2 targetAD = posToAngleDist(target);
+        IKhelper IK;
+        IK = new IKhelper(upperLegLength, lowerLegLength, targetAD.y);
+        IK.compute();
         
-        gl.glTranslatef((float)hipPos.x, (float)hipPos.y, (float)hipPos.z);
+        gl.glRotated(180-targetAD.x, 1.0, 0.0, 0.0);
+        gl.glRotated(IK.rot1, 1.0, 0.0, 0.0);
+        
+        /**
+         * Draw upper leg
+         */
+        gl.glTranslated(0, 0, -upperLegLength/2.0);
+        gl.glPushMatrix();
+        gl.glScaled(0.27, 0.27, upperLegLength);
         glut.glutSolidCube(1.0f);
+        gl.glPopMatrix();
+        gl.glTranslated(0, 0, -upperLegLength/2.0);
+        
+        gl.glRotated(IK.rot2, 1.0, 0.0, 0.0);
+        System.out.println(IK.rot2);
+        
+        /**
+         * Draw upper leg
+         */
+        gl.glTranslated(0, 0, -lowerLegLength/2.0);
+        gl.glPushMatrix();
+        gl.glScaled(0.27, 0.27, lowerLegLength);
+        glut.glutSolidCube(1.0f);
+        gl.glPopMatrix();
+        gl.glTranslated(0, 0, -lowerLegLength/2.0);
+        
         gl.glPopMatrix();
     }
     
@@ -70,7 +108,8 @@ class Robot {
     public void drawLegs(GL2 gl, GLU glu, GLUT glut, float tAnim){
         gl.glPushMatrix();
         
-        drawLeg(gl, glu, glut, tAnim);
+        gl.glTranslated(0.15, 0, 0.9);
+        drawLeg(gl, glu, glut, new Vector2(1, -1));
         
         gl.glPopMatrix();
     }
@@ -80,6 +119,8 @@ class Robot {
      * Draws this robot (as a {@code stickfigure} if specified).
      */
     public void draw(GL2 gl, GLU glu, GLUT glut, boolean stickFigure, float tAnim) {
+        posToAngleDist(new Vector2(3, 3));
+        
         gl.glPushMatrix();
         
         // Head
@@ -112,11 +153,9 @@ class Robot {
         gl.glPushMatrix();
         drawLegs(gl, glu, glut, tAnim);
         gl.glPopMatrix();
-        
-        IKhelper test = new IKhelper(1.0f, 2.0f, new Vector2(0.1f, 0.0f));
-        test.compute();
-        
+                
         gl.glPopMatrix();
+        
     }
 }
 
@@ -124,17 +163,21 @@ class Robot {
 class IKhelper{
     public double length1;
     public double length2;
-    public Vector2 target;
+    public double distance;
     
-    public Vector2 J1 = new Vector2(); // Joint 1
+    public double rot1; // Rotation of the "hip" joint
+    public double rot2; // Rotation of the "knee" joint
     
-    public double rot1;
-    public double rot2;
-    
-    public IKhelper(float length1_arg, float length2_arg, Vector2 target_arg){
+    public IKhelper(float length1_arg, float length2_arg, float distance_arg){
         length1 = length1_arg;
         length2 = length2_arg;
-        target = target_arg;
+        distance = distance_arg;
+    }
+    
+    public IKhelper(double length1_arg, double length2_arg, double distance_arg){
+        length1 = length1_arg;
+        length2 = length2_arg;
+        distance = distance_arg;
     }
     
     public void compute(){
@@ -145,7 +188,7 @@ class IKhelper{
          * B has radius length2, and is centered on target
          * Applying trigonometry on these constraints gives:
          */
-        double d = target.distance();
+        double d = distance;
         double x = (d*d-length2*length2+length1*length1)/(2.0*d);
         
         /**
@@ -160,6 +203,12 @@ class IKhelper{
             x = length1;
             d = length2;
         }
+        
+        /**
+         * Here we set the rotations
+         */
+        rot1 = Math.toDegrees(Math.acos(x/length1));
+        rot2 = - rot1 - Math.toDegrees(Math.acos((d-x)/length2));
     }
 }
 
@@ -168,6 +217,11 @@ class Vector2{
     public double y;
     
     public Vector2(float x_arg, float y_arg){
+        x = x_arg;
+        y = y_arg;
+    }
+    
+    public Vector2(double x_arg, double y_arg){
         x = x_arg;
         y = y_arg;
     }
