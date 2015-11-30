@@ -1,7 +1,9 @@
 package robotrace;
 
 import com.jogamp.opengl.util.gl2.GLUT;
+import static javax.media.opengl.GL.*;
 import javax.media.opengl.GL2;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.*;
 import javax.media.opengl.glu.GLU;
 
 /**
@@ -124,6 +126,10 @@ class Robot {
      * Draws this robot (as a {@code stickfigure} if specified).
      */
     public void draw(GL2 gl, GLU glu, GLUT glut, boolean stickFigure, float tAnim) {
+        gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse, 0);
+        gl.glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular, 0);
+        gl.glMaterialf(GL_FRONT, GL_SHININESS, material.shininess);
+        
         posToAngleDist(new Vector2(3, 3));
         
         gl.glPushMatrix();

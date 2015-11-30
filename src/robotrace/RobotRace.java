@@ -1,8 +1,8 @@
 package robotrace;
-
+import static java.lang.Math.*;
 import javax.media.opengl.GL;
 import static javax.media.opengl.GL2.*;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.*;
 
 /**
  * Handles all of the RobotRace graphics functionality,
@@ -80,20 +80,16 @@ public class RobotRace extends Base {
         robots = new Robot[4];
         
         // Initialize robot 0
-        robots[0] = new Robot(Material.GOLD
-            /* add other parameters that characterize this robot */);
+        robots[0] = new Robot(Material.GOLD);
         
         // Initialize robot 1
-        robots[1] = new Robot(Material.SILVER
-            /* add other parameters that characterize this robot */);
+        robots[1] = new Robot(Material.SILVER);
         
         // Initialize robot 2
-        robots[2] = new Robot(Material.WOOD
-            /* add other parameters that characterize this robot */);
+        robots[2] = new Robot(Material.WOOD);
 
         // Initialize robot 3
-        robots[3] = new Robot(Material.ORANGE
-            /* add other parameters that characterize this robot */);
+        robots[3] = new Robot(Material.ORANGE);
         
         // Initialize the camera
         camera = new Camera();
@@ -137,10 +133,6 @@ public class RobotRace extends Base {
      */
     @Override
     public void initialize() {
-        //Lighting
-        gl.glEnable(GL_LIGHTING);
-        gl.glEnable(GL_COLOR_MATERIAL);
-        gl.glEnable(GL_LIGHT0);
         
         // Enable blending.
         gl.glEnable(GL_BLEND);
@@ -218,38 +210,54 @@ public class RobotRace extends Base {
         
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
+        // Enable Color Material for the AxisFrame
+        gl.glEnable(GL_COLOR_MATERIAL);
+        
         // Draw the axis frame.
         if (gs.showAxes) {
             drawAxisFrame();
         }
         
+        // Get camera position for lightPos
+        float x = (float) (cos(gs.theta - ((1/18)* PI))*cos(gs.phi + ((1/18)* PI)));
+        float y = (float) (sin(gs.theta - ((1/18)* PI))*cos(gs.phi + ((1/18)* PI)));
+        float z = (float) sin(gs.phi + ((1/18)* PI));
+        float lightPos[] = { x, y, z, 0.0f };
+        
+        float[] ambient= { 0.2f, 0.2f, 0.2f, 1.0f};
+        float[] diffuse = {1.0f, 1.0f, 1.0f, 1.0f};
+        
+        
+        //Lighting
+        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, ambient ,0);                        // Set ambient for light 0
+        gl.glLightfv(GL_LIGHT0, GL_POSITION, lightPos ,0);                      // Set position for light 0
+        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse, 0);                        // Set diffuse for light 0
+        gl.glEnable(GL_LIGHTING);                                               // Enable Lighting
+        gl.glEnable(GL_LIGHT0);                                                 // Enable Light 0
+        gl.glDisable(GL_COLOR_MATERIAL);                                        // Disable Color Material
+
+        
         // Get the position and direction of the first robot.
         robots[0].position = raceTracks[gs.trackNr].getLanePoint(0, 0);
         robots[0].direction = raceTracks[gs.trackNr].getLaneTangent(0, 0);
         
-        // Draw the first robot.
+        // Draw the robots.
+        gl.glPushMatrix();
+        gl.glRotatef(-90f, 0.0f, 0.0f, 1.0f);
         robots[0].draw(gl, glu, glut, false, gs.tAnim);
+        gl.glTranslatef(-1.5f, 0f, 0f);
+        robots[1].draw(gl, glu, glut, false, gs.tAnim);
+        gl.glTranslatef(-1.5f, 0f, 0f);
+        robots[2].draw(gl, glu, glut, false, gs.tAnim);
+        gl.glTranslatef(-1.5f, 0f, 0f);
+        robots[3].draw(gl, glu, glut, false, gs.tAnim);
+        gl.glPopMatrix();
         
         // Draw the race track.
         raceTracks[gs.trackNr].draw(gl, glu, glut);
         
         // Draw the terrain.
         terrain.draw(gl, glu, glut);
-        
-        // Unit box around origin.
-        glut.glutWireCube(1f);
-
-        // Move in x-direction.
-        gl.glTranslatef(2f, 0f, 0f);
-        
-        // Rotate 30 degrees, around z-axis.
-        gl.glRotatef(30f, 0f, 0f, 1f);
-        
-        // Scale in z-direction.
-        gl.glScalef(1f, 1f, 2f);
-
-        // Translated, rotated, scaled box.
-        glut.glutWireCube(1f);
     }
     
     /**
