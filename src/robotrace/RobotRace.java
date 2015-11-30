@@ -243,14 +243,14 @@ public class RobotRace extends Base {
         
         // Draw the robots.
         gl.glPushMatrix();
-        gl.glRotatef(-90f, 0.0f, 0.0f, 1.0f);
-        robots[0].draw(gl, glu, glut, false, gs.tAnim);
+        //gl.glRotatef(-90f, 0.0f, 0.0f, 1.0f);
+        robots[0].draw(gl, glu, glut, gs.showStick, gs.tAnim);
         gl.glTranslatef(-1.5f, 0f, 0f);
-        robots[1].draw(gl, glu, glut, false, gs.tAnim);
+        robots[1].draw(gl, glu, glut, gs.showStick, gs.tAnim);
         gl.glTranslatef(-1.5f, 0f, 0f);
-        robots[2].draw(gl, glu, glut, false, gs.tAnim);
+        robots[2].draw(gl, glu, glut, gs.showStick, gs.tAnim);
         gl.glTranslatef(-1.5f, 0f, 0f);
-        robots[3].draw(gl, glu, glut, false, gs.tAnim);
+        robots[3].draw(gl, glu, glut, gs.showStick, gs.tAnim);
         gl.glPopMatrix();
         
         // Draw the race track.

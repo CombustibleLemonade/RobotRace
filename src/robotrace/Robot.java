@@ -17,11 +17,20 @@ class Robot {
     /** The direction in which the robot is running. */
     public Vector direction = new Vector(1, 0, 0);
 
+    public boolean isStickFigure = false;
+    
     /** The material from which this robot is built. */
     private final Material material;
     
+    double armXOffset = 0.44;
+    double legXOffset = 0.15;
+    
     double upperLegLength = 0.7;
     double lowerLegLength = 0.75;
+    
+    double legThickness = 0.27;
+    double stickThickness = 0.05;
+    double stickJointSize = 0.1;
     
     /**
      * Converts a position into an angle and a distance
@@ -32,6 +41,10 @@ class Robot {
         double distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
         double angle;
         angle = Math.toDegrees(Math.acos(pos.y / distance));
+        
+        if (pos.x < 0){
+            angle *= -1;
+        }
 
         return new Vector2(angle, distance);
     }
@@ -52,11 +65,18 @@ class Robot {
      */
     public void drawArm(GL2 gl, GLU glu, GLUT glut, float tAnim){
         gl.glPushMatrix();
-        gl.glTranslatef(0.44f, 0.0f, 0.0f); // Translate them outside of the body
+        gl.glTranslated(armXOffset, 0.0, 0.0); // Translate them outside of the body
         gl.glRotatef(-10, 0.0f, 1.0f, 0.0f); // Make arms point slightly outwards
-        gl.glTranslatef(0.0f, 0.0f, -0.3f); // Go down a bit
-        gl.glScalef(0.2f, 0.2f, 0.7f); // Scale the cubes to become long
-        glut.glutSolidCube(1.0f);
+        if (isStickFigure){
+            glut.glutSolidSphere(stickJointSize, 10, 10);
+            gl.glRotated(180.0, 1.0, 0.0, 0.0);
+            gl.glScaled(stickThickness, stickThickness, 0.7);
+            glut.glutSolidCylinder(1.0, 1.0, 10, 10);
+        } else {
+            gl.glTranslatef(0.0f, 0.0f, -0.3f); // Go down a bit
+            gl.glScalef(0.2f, 0.2f, 0.7f); // Scale the cubes to become long
+            glut.glutSolidCube(1.0f);
+        }
         gl.glPopMatrix();
     }
     
@@ -66,13 +86,16 @@ class Robot {
      */
     public void drawLeg(GL2 gl, GLU glu, GLUT glut, Vector2 target){
         gl.glPushMatrix();
+        if (isStickFigure){
+            glut.glutSolidSphere(stickJointSize, 20, 20);
+        }
+        
         Vector2 targetAD = posToAngleDist(target);
+        
         IKhelper IK;
         IK = new IKhelper(upperLegLength, lowerLegLength, targetAD.y);
         IK.compute();
         
-        System.out.println(targetAD.x);
-
         gl.glRotated(180-targetAD.x, 1.0, 0.0, 0.0);
         gl.glRotated(IK.rot1, 1.0, 0.0, 0.0);
         
@@ -81,10 +104,20 @@ class Robot {
          */
         gl.glTranslated(0, 0, -upperLegLength/2.0);
         gl.glPushMatrix();
-        gl.glScaled(0.27, 0.27, upperLegLength);
-        glut.glutSolidCube(1.0f);
+        if (isStickFigure){
+            gl.glTranslated(0, 0, -upperLegLength/2.0);
+            gl.glScaled(stickThickness, stickThickness, upperLegLength);
+            glut.glutSolidCylinder(1, 1, 10, 10);
+        } else {
+            gl.glScaled(legThickness, legThickness, upperLegLength);
+            glut.glutSolidCube(1.0f);
+        }
         gl.glPopMatrix();
         gl.glTranslated(0, 0, -upperLegLength/2.0);
+        
+        if (isStickFigure){
+            glut.glutSolidSphere(stickJointSize, 20, 20);
+        }
         
         gl.glRotated(IK.rot2, 1.0, 0.0, 0.0);
         
@@ -93,8 +126,14 @@ class Robot {
          */
         gl.glTranslated(0, 0, -lowerLegLength/2.0);
         gl.glPushMatrix();
-        gl.glScaled(0.27, 0.27, lowerLegLength);
-        glut.glutSolidCube(1.0f);
+        if (isStickFigure){
+            gl.glTranslated(0, 0, -lowerLegLength/2.0);
+            gl.glScaled(stickThickness, stickThickness, lowerLegLength);
+            glut.glutSolidCylinder(1, 1, 10, 10);
+        } else {
+            gl.glScaled(legThickness, legThickness, lowerLegLength);
+            glut.glutSolidCube(1.0f);
+        }
         gl.glPopMatrix();
         gl.glTranslated(0, 0, -lowerLegLength/2.0);
         
@@ -109,16 +148,24 @@ class Robot {
      * @param tAnim 
      */
     public void drawLegs(GL2 gl, GLU glu, GLUT glut, float tAnim){
+        double speed = 5.0;
+                
         gl.glPushMatrix();
-        gl.glTranslated(0.15, 0, 1.0);
-        drawLeg(gl, glu, glut, new Vector2(0.5 + 0.5 * Math.sin(tAnim * 3), -1));
+        gl.glTranslated(legXOffset, 0, 1.0);
+        drawLeg(gl, glu, glut, new Vector2(0.5 * Math.sin(tAnim * speed), -1));
+        
+        if (isStickFigure){
+            gl.glRotated(-90.0, 0.0, 1.0, 0.0);
+            gl.glScaled(stickThickness, stickThickness, legXOffset*2);
+            glut.glutSolidCylinder(1.0, 1.0, 10, 10);
+        }
+        
         gl.glPopMatrix();
         
-        /**
         gl.glPushMatrix();
-        gl.glTranslated(-0.15, 0, 1.0);
-        drawLeg(gl, glu, glut, new Vector2(1, -1));
-        gl.glPopMatrix();*/
+        gl.glTranslated(-legXOffset, 0, 1.0);
+        drawLeg(gl, glu, glut, new Vector2(0.5 * Math.sin(tAnim * speed + Math.PI), -1));
+        gl.glPopMatrix();
     }
     
     
@@ -126,17 +173,16 @@ class Robot {
      * Draws this robot (as a {@code stickfigure} if specified).
      */
     public void draw(GL2 gl, GLU glu, GLUT glut, boolean stickFigure, float tAnim) {
+        isStickFigure = stickFigure;
+        
         gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse, 0);
         gl.glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular, 0);
         gl.glMaterialf(GL_FRONT, GL_SHININESS, material.shininess);
-        
-        posToAngleDist(new Vector2(3, 3));
         
         gl.glPushMatrix();
         
         // Head
         gl.glPushMatrix();
-        gl.glColor3f(0.6f, 0.6f, 0.6f);
         
         gl.glTranslatef(0.0f, 0.0f, 1.87f);
         gl.glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
@@ -147,9 +193,16 @@ class Robot {
         
         //Torso
         gl.glPushMatrix();
-        gl.glTranslatef(0.0f, 0.0f, 1.3f);
-        gl.glScalef(0.616f, 0.426f, 0.8f);
-        glut.glutSolidCube(1.0f);
+
+        if (isStickFigure){
+            gl.glTranslated(0.0, 0.0, 1.0);
+            gl.glScaled(stickThickness, stickThickness, 1.0);
+            glut.glutSolidCylinder(1.0, 1.0, 10, 10);
+        } else {
+            gl.glTranslatef(0.0f, 0.0f, 1.3f);
+            gl.glScalef(0.616f, 0.426f, 0.8f);
+            glut.glutSolidCube(1.0f);
+        }
         gl.glPopMatrix();
         
         // Arms
@@ -158,6 +211,12 @@ class Robot {
         drawArm(gl, glu, glut, tAnim);
         gl.glScalef(-1.0f, 1.0f, 1.0f);
         drawArm(gl, glu, glut, tAnim);
+        if (isStickFigure){
+            gl.glTranslated(armXOffset, 0.0, 0.0);
+            gl.glRotated(-90.0, 0.0, 1.0, 0.0);
+            gl.glScaled(stickThickness, stickThickness, armXOffset*2);
+            glut.glutSolidCylinder(1.0, 1.0, 10, 10);
+        }
         gl.glPopMatrix();
         
         // Legs
