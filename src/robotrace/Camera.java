@@ -20,8 +20,7 @@ class Camera {
      */
     public void update(GlobalState gs, Robot focus) {
 
-        switch (gs.camMode) {
-            
+        switch (gs.camMode) {    
             // Helicopter mode
             case 1:
                 setHelicopterMode(gs, focus);
@@ -44,7 +43,7 @@ class Camera {
                 
             // Default mode    
             default:
-                setDefaultMode(gs);
+                setHelicopterMode(gs, focus);
         }
     }
 
@@ -63,7 +62,13 @@ class Camera {
      * The camera should focus on the robot.
      */
     private void setHelicopterMode(GlobalState gs, Robot focus) {
-        // code goes here ...
+        // eye = focus.position;
+        eye.x = -1;
+        eye.y = 0;
+        eye.z = 10;
+        center = focus.position;
+        System.out.println(center);
+        System.out.println(eye);
     }
 
     /**

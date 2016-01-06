@@ -1,6 +1,8 @@
 package robotrace;
 
 import com.jogamp.opengl.util.gl2.GLUT;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import static javax.media.opengl.GL.*;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.*;

@@ -98,10 +98,10 @@ class RaceTrack {
      */
     public Vector getLaneTangent(int lane, double t) {
         if (null == controlPoints) {
-            
         } else {
             return Vector.O; // <- code goes here
         }
+        return null;
     }
 
     /**
