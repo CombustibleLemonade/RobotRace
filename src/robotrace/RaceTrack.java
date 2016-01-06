@@ -3,6 +3,7 @@ package robotrace;
 import com.jogamp.opengl.util.gl2.GLUT;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
+import static java.lang.Math.*;
 
 /**
  * Implementation of a race track that is made from Bezier segments.
@@ -34,6 +35,43 @@ class RaceTrack {
     public void draw(GL2 gl, GLU glu, GLUT glut) {
         if (null == controlPoints) {
             // draw the test track
+            gl.glColor3f(0, 0, 1);
+            gl.glBegin(gl.GL_QUAD_STRIP);
+            
+            for(double i = 0; i<1.01; i+=0.01){
+                float x1 = (float) (getPoint(i).x - (2 * laneWidth * getTangent(i).y));
+                float y1 = (float) (getPoint(i).y + (2 * laneWidth * getTangent(i).x));
+                float x2 = (float) (getPoint(i).x + (2 * laneWidth * getTangent(i).y));
+                float y2 = (float) (getPoint(i).y - (2 * laneWidth * getTangent(i).x));
+                
+                gl.glVertex3f(x1,y1,1);
+                gl.glVertex3f(x2,y2,1);
+            }
+            gl.glColor3f(0, 0, 0);
+            gl.glEnd();
+            gl.glBegin(gl.GL_QUAD_STRIP);
+            
+            for(double i = 0; i<1.01; i+=0.01){
+                float x1 = (float) (getPoint(i).x - (2 * laneWidth * getTangent(i).y));
+                float y1 = (float) (getPoint(i).y + (2 * laneWidth * getTangent(i).x));
+                
+                gl.glVertex3f(x1,y1,1);
+                gl.glVertex3f(x1,y1,-1);
+            }
+            gl.glEnd();
+            gl.glBegin(gl.GL_QUAD_STRIP);
+            
+            for(double i = 0; i<1.01; i+=0.01){
+                float x2 = (float) (getPoint(i).x + (2 * laneWidth * getTangent(i).y));
+                float y2 = (float) (getPoint(i).y - (2 * laneWidth * getTangent(i).x));
+                
+                gl.glVertex3f(x2,y2,1);
+                gl.glVertex3f(x2,y2,-1);
+            }
+            gl.glColor3f(0, 0, 0);
+            gl.glEnd();
+            
+            
         } else {
             // draw the spline track
         }
@@ -45,7 +83,10 @@ class RaceTrack {
      */
     public Vector getLanePoint(int lane, double t) {
         if (null == controlPoints) {
-            return Vector.O; // <- code goes here
+            float x = (float) (getPoint(t).x + ((-1.5 + lane) * laneWidth * getTangent(t).y));
+            float y = (float) (getPoint(t).y - ((-1.5 + lane) * laneWidth * getTangent(t).x));
+            Vector lanePoint = new Vector(x,y,1);
+            return lanePoint;
         } else {
             return Vector.O; // <- code goes here
         }
@@ -57,7 +98,7 @@ class RaceTrack {
      */
     public Vector getLaneTangent(int lane, double t) {
         if (null == controlPoints) {
-            return Vector.O; // <- code goes here
+            
         } else {
             return Vector.O; // <- code goes here
         }
@@ -67,14 +108,20 @@ class RaceTrack {
      * Returns a point on the test track at 0 <= t < 1.
      */
     private Vector getPoint(double t) {
-        return Vector.O; // <- code goes here
+        double pointX = 10*cos(PI*2*t);
+        double pointY = 14*sin(PI*2*t);
+        Vector point = new Vector(pointX,pointY,1);
+        return point;
     }
 
     /**
      * Returns a tangent on the test track at 0 <= t < 1.
      */
     private Vector getTangent(double t) {
-        return Vector.O; // <- code goes here
+        double tangentX = -20*PI*sin(PI*2*t)/sqrt(pow(-20*PI*sin(PI*2*t),2)+pow(28*PI*cos(PI*2*t),2));
+        double tangentY = 28*PI*cos(PI*2*t)/sqrt(pow(-20*PI*sin(PI*2*t),2)+pow(28*PI*cos(PI*2*t),2));
+        Vector tangent = new Vector(tangentX,tangentY,0);
+        return tangent;
     }
     
     /**

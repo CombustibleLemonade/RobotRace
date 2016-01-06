@@ -253,6 +253,7 @@ public class RobotRace extends Base {
         robots[3].draw(gl, glu, glut, gs.showStick, gs.tAnim);
         gl.glPopMatrix();
         
+        gl.glEnable(GL_COLOR_MATERIAL);
         // Draw the race track.
         raceTracks[gs.trackNr].draw(gl, glu, glut);
         
