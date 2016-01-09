@@ -67,8 +67,6 @@ class Camera {
         eye.y = 0;
         eye.z = 10;
         center = focus.position;
-        System.out.println(center);
-        System.out.println(eye);
     }
 
     /**

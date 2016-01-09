@@ -24,7 +24,7 @@ class Terrain {
      * Draws the terrain.
      */
     public void draw(GL2 gl, GLU glu, GLUT glut) {
-        gl.glEnable(GL_TEXTURE_1D);
+        gl.glEnable(GL_TEXTURE_2D);
         float terrainTexColors[] = {
 //            21f, 43f, 18f, 1.0f,
 //            21f, 43f, 18f, 1.0f,
@@ -47,7 +47,9 @@ class Terrain {
         FloatBuffer terrainTex;
         terrainTex = FloatBuffer.wrap(terrainTexColors);
         
-        gl.glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainTex);
+        
+        
+        gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainTex);
         
         int mapSize = 41;
         gl.glPushMatrix();
