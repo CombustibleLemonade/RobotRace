@@ -1,23 +1,56 @@
 package robotrace;
 
 import com.jogamp.opengl.util.gl2.GLUT;
+import java.awt.Color;
 import static java.lang.Math.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Random;
+import static javax.media.opengl.GL.GL_FLOAT;
+import static javax.media.opengl.GL.GL_NEAREST;
+import static javax.media.opengl.GL.GL_REPEAT;
+import static javax.media.opengl.GL.GL_RGBA;
 import static javax.media.opengl.GL.GL_TEXTURE_2D;
+import static javax.media.opengl.GL.GL_TEXTURE_MAG_FILTER;
+import static javax.media.opengl.GL.GL_TEXTURE_MIN_FILTER;
+import static javax.media.opengl.GL.GL_TEXTURE_WRAP_S;
+import static javax.media.opengl.GL.GL_TEXTURE_WRAP_T;
+import static javax.media.opengl.GL.GL_TRIANGLE_STRIP;
+import static javax.media.opengl.GL.GL_UNSIGNED_BYTE;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2GL3.*;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 import javax.media.opengl.glu.GLU;
 
 /**
  * Implementation of the terrain.
  */
 class Terrain {
-
+    ByteBuffer bb;
+    
     /**
      * Can be used to set up a display list.
      */
     public Terrain() {
-       
+        Color colors[] = new Color[1024];
+        Random r = new Random();
+        
+        for(int i = 0; i < 1024; i++){
+            colors[i] = new Color(r.nextFloat(), r.nextFloat(), r.nextFloat());
+        }
+        
+        bb = ByteBuffer.allocateDirect(colors.length * 4).order(ByteOrder.nativeOrder());
+
+        for (Color color : colors){
+            int pixel = color.getRGB();
+            bb.put((byte) ((pixel >> 16) & 0xFF)); // Red component
+            bb.put((byte) ((pixel >> 8) & 0xFF));  // Green component
+            bb.put((byte) (pixel & 0xFF));         // Blue component
+            bb.put((byte) ((pixel >> 24) & 0xFF)); // Alpha component
+        }
+        
+        bb.flip();
     }
 
     /**
@@ -25,7 +58,7 @@ class Terrain {
      */
     public void draw(GL2 gl, GLU glu, GLUT glut) {
         float terrainTexColors[] = {
-            21f, 43f, 18f, 1.0f,
+            210f, 43f, 18f, 1.0f,
             21f, 43f, 18f, 1.0f,
             29f, 58f, 24f, 1.0f,
             29f, 58f, 24f, 1.0f,
@@ -45,32 +78,38 @@ class Terrain {
         
         FloatBuffer terrainTex;
         terrainTex = FloatBuffer.wrap(terrainTexColors);
-        
-        
-        
-        gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainTex);
-        
+                
         gl.glEnable(GL_TEXTURE_2D);
+        gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, bb);
+
+
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
         int mapSize = 41;
         gl.glPushMatrix();
         for(float x = 1; x < mapSize-1; x+=0.25){
             gl.glBegin(GL_TRIANGLE_STRIP);
             for(float y = 1; y < mapSize-1; y+=0.25){
+                gl.glNormal3f(0.0f, 0.0f, 1.0f);
 //                gl.glNormal3f((float)Normal(x-21,y-21).x,(float)Normal(x-21,y-21).y,(float)Normal(x-21,y-21).z);
 //                gl.glTexCoord1f((heightAt(x-32, y-21)+1)/2);
-                gl.glTexCoord2f(0.5f,1f);
+                gl.glTexCoord2f(0.0f, 0.0f);
                 gl.glVertex3f(x-21, y-21, heightAt(x-21, y-21));
 //                gl.glNormal3f((float)Normal(x-20,y-21).x,(float)Normal(x-20,y-21).y,(float)Normal(x-20,y-21).z);
 //                gl.glTexCoord1f((heightAt(x-20, y-21)+1)/2);
-                gl.glTexCoord2f(0.5f,1f);
+                gl.glTexCoord2f(1.0f, 0.0f);
                 gl.glVertex3f(x-20, y-21, heightAt(x-20, y-21));
 //                gl.glNormal3f((float)Normal(x-21,y-20).x,(float)Normal(x-21,y-20).y,(float)Normal(x-21,y-20).z);
 //                gl.glTexCoord1f((heightAt(x-21, y-20)+1)/2);
-                gl.glTexCoord2f(0.5f,1f);
+                gl.glTexCoord2f(0.0f, 1.0f);
                 gl.glVertex3f(x-21, y-20, heightAt(x-21, y-20));
 //                gl.glNormal3f((float)Normal(x-20,y-20).x,(float)Normal(x-20,y-20).y,(float)Normal(x-20,y-20).z);
 //                gl.glTexCoord1f((heightAt(x-20, y-20)+1)/2);
-                gl.glTexCoord2f(0.5f,1f);
+                gl.glTexCoord2f(1.0f, 1.0f);
                 gl.glVertex3f(x-20, y-20, heightAt(x-20, y-20));
             }
             gl.glEnd();

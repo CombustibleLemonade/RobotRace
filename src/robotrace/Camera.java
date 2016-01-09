@@ -43,7 +43,7 @@ class Camera {
                 
             // Default mode    
             default:
-                setHelicopterMode(gs, focus);
+                setDefaultMode(gs);
         }
     }
 
