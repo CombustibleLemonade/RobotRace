@@ -1,43 +1,54 @@
 package robotrace;
 
 import com.jogamp.opengl.util.gl2.GLUT;
-import java.awt.Color;
+import java.awt.*;
 import static java.lang.Math.*;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.util.Random;
-import static javax.media.opengl.GL.GL_FLOAT;
-import static javax.media.opengl.GL.GL_NEAREST;
-import static javax.media.opengl.GL.GL_REPEAT;
-import static javax.media.opengl.GL.GL_RGBA;
-import static javax.media.opengl.GL.GL_TEXTURE_2D;
-import static javax.media.opengl.GL.GL_TEXTURE_MAG_FILTER;
-import static javax.media.opengl.GL.GL_TEXTURE_MIN_FILTER;
-import static javax.media.opengl.GL.GL_TEXTURE_WRAP_S;
-import static javax.media.opengl.GL.GL_TEXTURE_WRAP_T;
-import static javax.media.opengl.GL.GL_TRIANGLE_STRIP;
-import static javax.media.opengl.GL.GL_UNSIGNED_BYTE;
+import java.nio.*;
+import java.util.*;
+import static javax.media.opengl.GL.*;
 import javax.media.opengl.GL2;
-import static javax.media.opengl.GL2GL3.*;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_COLOR_MATERIAL;
 import javax.media.opengl.glu.GLU;
 
 /**
  * Implementation of the terrain.
  */
 class Terrain {
+    
+    Random r = new Random();
     ByteBuffer bb;
+    int gensize = (int)(pow(2,8) + 1);
+    private final int width = 163;
+    private final int height = 163;
+    private final float variance = 2;
+    float[][] map = new float[gensize][gensize];
+    float[][] terrainHeight = generate();
     
     /**
      * Can be used to set up a display list.
      */
     public Terrain() {
-        Color colors[] = new Color[1024];
-        Random r = new Random();
-        
-        for(int i = 0; i < 1024; i++){
-            colors[i] = new Color(r.nextFloat(), r.nextFloat(), r.nextFloat());
+        Color colors[] = new Color[16];
+        int terrainTexColors[] = {
+            43, 79, 105,
+            43, 79, 105,
+            43, 79, 105,
+            43, 79, 105,
+            43, 79, 105,
+            53, 98, 131,
+            53, 98, 131,
+            255, 254, 254,
+            248, 240, 164,
+            218, 215, 191,
+            53, 104, 45,
+            39, 78, 33,
+            29, 58, 24,
+            29, 58, 24,
+            21, 43, 18,
+            21, 43, 18,
+        };
+        for(int i = 0; i < 16; i++){
+            colors[i] = new Color(terrainTexColors[(3*i)], terrainTexColors[(3*i)+1], terrainTexColors[(3*i)+2]);
         }
         
         bb = ByteBuffer.allocateDirect(colors.length * 4).order(ByteOrder.nativeOrder());
@@ -57,105 +68,195 @@ class Terrain {
      * Draws the terrain.
      */
     public void draw(GL2 gl, GLU glu, GLUT glut) {
-        float terrainTexColors[] = {
-            210f, 43f, 18f, 1.0f,
-            21f, 43f, 18f, 1.0f,
-            29f, 58f, 24f, 1.0f,
-            29f, 58f, 24f, 1.0f,
-            39f, 78f, 33f, 1.0f,
-            53f, 104f, 45f, 1.0f,
-            248f, 240f, 164f, 1.0f,
-            218f, 215f, 191f, 1.0f,
-            255f, 254f, 254f, 1.0f,
-            53f, 98f, 131f, 1.0f,
-            53f, 98f, 131f, 1.0f,
-            43f, 79f, 105f, 1.0f,
-            43f, 79f, 105f, 1.0f,
-            43f, 79f, 105f, 1.0f,
-            43f, 79f, 105f, 1.0f,
-            43f, 79f, 105f, 1.0f
-        };
-        
-        FloatBuffer terrainTex;
-        terrainTex = FloatBuffer.wrap(terrainTexColors);
-                
+        gl.glDisable(GL_COLOR_MATERIAL);
         gl.glEnable(GL_TEXTURE_2D);
-        gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, bb);
+        gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, bb);
 
 
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
         int mapSize = 41;
         gl.glPushMatrix();
-        for(float x = 1; x < mapSize-1; x+=0.25){
-            gl.glBegin(GL_TRIANGLE_STRIP);
-            for(float y = 1; y < mapSize-1; y+=0.25){
-                gl.glNormal3f(0.0f, 0.0f, 1.0f);
-//                gl.glNormal3f((float)Normal(x-21,y-21).x,(float)Normal(x-21,y-21).y,(float)Normal(x-21,y-21).z);
-//                gl.glTexCoord1f((heightAt(x-32, y-21)+1)/2);
-                gl.glTexCoord2f(0.0f, 0.0f);
-                gl.glVertex3f(x-21, y-21, heightAt(x-21, y-21));
-//                gl.glNormal3f((float)Normal(x-20,y-21).x,(float)Normal(x-20,y-21).y,(float)Normal(x-20,y-21).z);
-//                gl.glTexCoord1f((heightAt(x-20, y-21)+1)/2);
-                gl.glTexCoord2f(1.0f, 0.0f);
-                gl.glVertex3f(x-20, y-21, heightAt(x-20, y-21));
-//                gl.glNormal3f((float)Normal(x-21,y-20).x,(float)Normal(x-21,y-20).y,(float)Normal(x-21,y-20).z);
-//                gl.glTexCoord1f((heightAt(x-21, y-20)+1)/2);
-                gl.glTexCoord2f(0.0f, 1.0f);
-                gl.glVertex3f(x-21, y-20, heightAt(x-21, y-20));
-//                gl.glNormal3f((float)Normal(x-20,y-20).x,(float)Normal(x-20,y-20).y,(float)Normal(x-20,y-20).z);
-//                gl.glTexCoord1f((heightAt(x-20, y-20)+1)/2);
-                gl.glTexCoord2f(1.0f, 1.0f);
-                gl.glVertex3f(x-20, y-20, heightAt(x-20, y-20));
+        gl.glBegin(GL_TRIANGLES);
+        for(float x = 0; x < mapSize-1.25; x+=0.25){
+            for(float y = 0; y < mapSize-1; y+=0.25){
+                gl.glNormal3f((float) (-(heightAt(x+0.25f,y)-heightAt(x,y))*0.25), (float)(-(heightAt(x,y+0.25f)-heightAt(x,y))*0.25), 0.25f*0.25f);
+                
+                gl.glTexCoord2f((heightAt(x, y)+1)/2, 0.0f);
+                gl.glVertex3f(x-21, y-21, heightAt(x, y));
+                
+                gl.glTexCoord2f((heightAt(x+0.25f, y)+1)/2, 0.0f);
+                gl.glVertex3f(x-20.75f, y-21, heightAt(x+0.25f, y));
+                
+                gl.glTexCoord2f((heightAt(x, y+0.25f)+1)/2, 1.0f);
+                gl.glVertex3f(x-21, y-20.75f, heightAt(x, y+0.25f));
+                
+                gl.glNormal3f((float) (0.25f*(heightAt(x,y+0.25f)-heightAt(x+0.25f,y+0.25f))),(float)(-(heightAt(x+0.25f,y)-heightAt(x+0.25f,y+0.25f))*-0.25f),-0.25f*-0.25f);
+                
+                gl.glTexCoord2f((heightAt(x+0.25f, y+0.25f)+1)/2, 1.0f);
+                gl.glVertex3f(x-20.75f, y-20.75f, heightAt(x+0.25f, y+0.25f));
+
+                gl.glTexCoord2f((heightAt(x+0.25f, y)+1)/2, 0.0f);
+                gl.glVertex3f(x-20.75f, y-21, heightAt(x+0.25f, y));
+
+                gl.glTexCoord2f((heightAt(x, y+0.25f)+1)/2, 1.0f);
+                gl.glVertex3f(x-21, y-20.75f, heightAt(x, y+0.25f));
             }
-            gl.glEnd();
         }
+        gl.glEnd();
         gl.glPopMatrix();
         gl.glDisable(GL_TEXTURE_2D);
+        gl.glEnable(GL_COLOR_MATERIAL);
+        gl.glEnable(GL_BLEND);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl.glColor4f(166,166,166,0.2f);
+        gl.glPushMatrix();
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glVertex3f(-21,-21,0);
+        gl.glVertex3f(-21,21,0);
+        gl.glVertex3f(21,21,0);
+        gl.glVertex3f(21,-21,0);
+        gl.glEnd();
+        gl.glPopMatrix();
+        gl.glDisable(GL_BLEND);
+        
+        gl.glDisable(GL_COLOR_MATERIAL);
     }
 
     /**
      * Computes the elevation of the terrain at (x, y).
      */
     public float heightAt(float x, float y) {
-        float height =  (float) (0.6 * cos(0.3 * x + 0.2 * y) + 0.4 * cos(x - 0.5 * y));
-        return height;
-    }
-    
-/*    private Vector Normal(float x, float y){
-        Vector nor1 = new Vector(0,0,0);
-        float nor1Length = (float)(sqrt(Math.pow((0.25 * heightAt((float)(x + 0.25), (float)(y)))-(heightAt((float)(x + 0.25), (float)(y + 0.25))*0),2)+Math.pow((heightAt((float)(x+0.25),(float)(y+0.25))*0.25)-(0.25*heightAt((float)(x+0.25),(float)(y))),2)+Math.pow((0.25*0)-(0.25*0.25),2)));
-        nor1.x = (0.25 * heightAt((float)(x + 0.25), (float)(y)))-(heightAt((float)(x + 0.25), (float)(y + 0.25))*0)/nor1Length;
-        nor1.y = (heightAt((float)(x+0.25),(float)(y+0.25))*0.25)-(0.25*heightAt((float)(x+0.25),(float)(y)))/nor1Length;
-        nor1.z = (0.25*0)-(0.25*0.25)/nor1Length;
-        Vector nor2 = new Vector(0,0,0);
-        nor2.x = (0 * heightAt((float)(x), (float)(y-0.25)))-(heightAt((float)(x + 0.25), (float)(y))*-0.25);
-        nor2.y = (heightAt((float)(x+0.25),(float)(y))*0)-(0.25*heightAt((float)(x),(float)(y-0.25)));
-        nor2.z = (0.25*-0.25)-(0*0);
-        Vector nor3 = new Vector(0,0,0);
-        nor3.x = (-0.25 * heightAt((float)(x-0.25), (float)(y-0.25)))-(heightAt((float)(x), (float)(y-0.25))*-0.25);
-        nor3.y = (heightAt((float)(x),(float)(y-0.25))*-0.25)-(0*heightAt((float)(x-0.25),(float)(y-0.25)));
-        nor3.z = (0*-0.25)-(-0.25*-0.25);
-        Vector nor4 = new Vector(0,0,0);
-        nor4.x = (-0.25 * heightAt((float)(x-0.25), (float)(y)))-(heightAt((float)(x-0.25), (float)(y-0.25))*0);
-        nor4.y = (heightAt((float)(x-0.25),(float)(y-0.25))*-0.25)-(-0.25*heightAt((float)(x-0.25),(float)(y)));
-        nor4.z = (-0.25*0)-(-0.25*-0.25);
-        Vector nor5 = new Vector(0,0,0);
-        nor5.x = (0 * heightAt((float)(x), (float)(y+0.25)))-(heightAt((float)(x-0.25), (float)(y))*0);
-        nor5.y = (heightAt((float)(x-0.25),(float)(y))*0)-(-0.25*heightAt((float)(x),(float)(y+0.25)));
-        nor5.z = (-0.25*0.25)-(0*0);
-        Vector nor6 = new Vector(0,0,0);
-        nor6.x = (0.25 * heightAt((float)(x+0.25), (float)(y+0.25)))-(heightAt((float)(x), (float)(y+0.25))*0.25);
-        nor6.y = (heightAt((float)(x),(float)(y+0.25))*0.25)-(0*heightAt((float)(x+0.25),(float)(y+0.25)));
-        nor6.z = (0*0.25)-(0.25*0.25);
-        Normalize(nor1);
         
-        Vector normal = new Vector(0,0,0);
-        return normal;
+        float terHeight =  (float)(((terrainHeight[(int)(x*4)][(int)(y*4)]))-1);
+        return terHeight;
+    }   
+
+    public float[][] generate() {
+        // Place initial seeds for corners
+        map[0][0] = r.nextFloat()*2;
+        map[0][map.length - 1] = r.nextFloat()*2;
+        map[map.length - 1][0] = r.nextFloat()*2;
+        map[map.length - 1][map.length - 1] = r.nextFloat()*2;
+        map = generate(map);
+        if(width < gensize || height < gensize){
+            float[][] temp = new float[width][height];
+            for(int i = 0; i < temp.length; i++){
+                temp[i] = Arrays.copyOf(map[i], temp[i].length);
+            }
+            map = temp;
+        }
+        return map;
     }
-*/
+        
+    public float[][] generate(float[][] map){
+        int step = map.length - 1;
+        float v = variance;
+        float var = 0;
+        while(step > 1){
+            // SQUARE STEP
+            for(int i = 0; i < map.length - 1; i += step){
+                for(int j = 0; j < map[i].length - 1; j += step){
+                    float average = (map[i][j] + map[i + step][j] + map[i][j + step] + map[i+step][j+step])/4;
+                    if(map[i + step/2][j + step/2] == 0) // check if not pre-seeded
+                        var = randVariance(v);
+                        if(average + var >= 2){
+                            map[i+step/2][j+step/2] = 1.99f;
+                        }
+                        else if(average + var <= 0){
+                            map[i + step/2][j + step/2] = 0.01f;
+                        }
+                        else{
+                            map[i + step/2][j + step/2] = average + var;
+                        }
+                }
+            }
+            // DIAMOND STEP
+            for(int i = 0; i < map.length - 1; i += step){
+                for(int j = 0; j < map[i].length - 1; j += step){
+                    if(map[i + step/2][j] == 0){ // check if not pre-seeded
+                        var = randVariance(v);
+                        if(averageDiamond(map, i + step/2, j, step) + var >=2){
+                            map[i + step/2][j]=1.99f;
+                        }
+                        else if(averageDiamond(map, i + step/2, j, step) + var <0){
+                            map[i + step/2][j]=0.01f;
+                        }
+                        else{
+                            map[i + step/2][j] = averageDiamond(map, i + step/2, j, step) + var;
+                        }
+                    }
+                    if(map[i][j + step/2] == 0){
+                        var = randVariance(v);
+                        if(averageDiamond(map, i, j + step/2, step) + var >=2){
+                            map[i][j + step/2]=1.99f;
+                        }
+                        else if(averageDiamond(map, i, j + step/2, step) + var <0){
+                            map[i][j + step/2]=0.01f;
+                        }
+                        else{
+                            map[i][j + step/2] = averageDiamond(map, i, j + step/2, step) + var;
+                        }
+                    }
+                    if(map[i + step][j + step/2] == 0){
+                        var = randVariance(v);
+                        if(averageDiamond(map, i, j + step/2, step) + var >=2){
+                            map[i][j + step/2]=1.99f;
+                        }
+                        else if(averageDiamond(map, i, j + step/2, step) + var <0){
+                            map[i][j + step/2]=0.01f;
+                        }
+                        else{
+                            map[i][j + step/2] = averageDiamond(map, i + step, j + step/2, step) + var;
+                        }
+                    }
+                    if(map[i + step/2][j + step] == 0){
+                        var = randVariance(v);
+                        if(averageDiamond(map, i + step/2, j + step, step) + var >=2){
+                            map[i + step/2][j + step]=1.99f;
+                        }
+                        else if(averageDiamond(map, i + step/2, j + step, step) + var <0){
+                            map[i + step/2][j + step]=0.01f;
+                        }
+                        else{
+                            map[i + step/2][j + step] = averageDiamond(map, i + step/2, j + step, step) + var;
+                        }
+                    }
+                }       
+            }
+            v /=2;
+            step /= 2;
+        }
+        return map;
+    }
+
+    private float averageDiamond(float[][] map, int x, int y, int step){
+        int count = 0;
+        float average = 0;
+        if(x - step/2 >= 0){
+            count++;
+            average += map[x - step/2][y];
+        }
+        if(x + step/2 < map.length){
+            count++;
+            average += map[x + step/2][y];
+        }
+        if(y - step/2 >= 0){
+            count++;
+            average += map[x][y - step/2];
+        }
+        if(y + step/2 < map.length){
+            count++;
+            average += map[x][y + step/2];
+        }
+        return average/count;
+    }
+
+    private float randVariance(float v){
+        return (float) (r.nextFloat()*2*v - v);
+    }
 }
