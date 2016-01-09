@@ -257,6 +257,7 @@ public class RobotRace extends Base {
         // Draw the race track.
         raceTracks[gs.trackNr].draw(gl, glu, glut);
         
+        gl.glDisable(GL_COLOR_MATERIAL);
         // Draw the terrain.
         terrain.draw(gl, glu, glut);
     }
