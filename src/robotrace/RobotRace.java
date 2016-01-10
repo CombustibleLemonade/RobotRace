@@ -150,11 +150,11 @@ public class RobotRace extends Base {
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glBindTexture(GL_TEXTURE_2D, 0);
 		
-	    // Try to load four textures, add more if you like.
-        track = loadTexture("track.jpg");
-        brick = loadTexture("brick.jpg");
-        head = loadTexture("head.jpg");
-        torso = loadTexture("torso.jpg");
+	// Try to load four textures, add more if you like.
+        track = loadTexture("robotrace/track.jpg");       
+        brick = loadTexture("robotrace/brick.jpg");
+        head = loadTexture("robotrace/head.jpg");
+        torso = loadTexture("robotrace/torso.jpg");
     }
     
     /**
@@ -241,17 +241,18 @@ public class RobotRace extends Base {
         robots[0].position = raceTracks[gs.trackNr].getLanePoint(0, 0);
         robots[0].direction = raceTracks[gs.trackNr].getLaneTangent(0, 0);
         
-        // Draw the robots.
-        gl.glPushMatrix();
-        //gl.glRotatef(-90f, 0.0f, 0.0f, 1.0f);
+        double t = gs.tAnim * 0.03;
+        
+        for (int i=0; i < robots.length; i++){
+            robots[i].position = raceTracks[gs.trackNr].getLanePoint(i, t);
+            robots[i].direction = raceTracks[gs.trackNr].getLaneTangent(i, t);
+        }
+        
+        // Draw the robots.        
         robots[0].draw(gl, glu, glut, gs.showStick, gs.tAnim);
-        gl.glTranslatef(-1.5f, 0f, 0f);
         robots[1].draw(gl, glu, glut, gs.showStick, gs.tAnim);
-        gl.glTranslatef(-1.5f, 0f, 0f);
         robots[2].draw(gl, glu, glut, gs.showStick, gs.tAnim);
-        gl.glTranslatef(-1.5f, 0f, 0f);
         robots[3].draw(gl, glu, glut, gs.showStick, gs.tAnim);
-        gl.glPopMatrix();
         
         gl.glEnable(GL_COLOR_MATERIAL);
         // Draw the race track.

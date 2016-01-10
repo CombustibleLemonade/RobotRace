@@ -6,3 +6,4 @@ nbproject/jnlp-impl.xml
 *.properties
 nbproject/private/private.properties
 /dist/
+nbproject/private/private.xml

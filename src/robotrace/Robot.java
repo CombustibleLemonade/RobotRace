@@ -88,6 +88,7 @@ class Robot {
      */
     public void drawLeg(GL2 gl, GLU glu, GLUT glut, Vector2 target){
         gl.glPushMatrix();
+        
         if (isStickFigure){
             glut.glutSolidSphere(stickJointSize, 20, 20);
         }
@@ -182,6 +183,12 @@ class Robot {
         gl.glMaterialf(GL_FRONT, GL_SHININESS, material.shininess);
         
         gl.glPushMatrix();
+        
+        // Translate to the correct position
+        gl.glTranslated(position.x, position.y, position.z);
+        // Rotate to face track tangent
+        double rotation = - 180 * Math.atan(direction.x / direction.y) / Math.PI + Math.signum(direction.y) * 90 - 90;
+        gl.glRotated(rotation, 0.0, 0.0, 1.0);
         
         // Head
         gl.glPushMatrix();

@@ -50,7 +50,9 @@ class RaceTrack {
         
             gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            
             track.bind(gl);
+            
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
@@ -116,10 +118,10 @@ class RaceTrack {
      */
     public Vector getLaneTangent(int lane, double t) {
         if (null == controlPoints) {
+            return getTangent(t);
         } else {
             return Vector.O; // <- code goes here
         }
-        return null;
     }
 
     /**
