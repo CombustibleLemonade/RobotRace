@@ -5,8 +5,10 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import static javax.media.opengl.GL.*;
 import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2GL3.*;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.*;
 import javax.media.opengl.glu.GLU;
+import static robotrace.Base.head;
 
 /**
 * Represents a Robot, to be implemented according to the Assignments.
@@ -198,7 +200,37 @@ class Robot {
         gl.glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
 
         glut.glutSolidTeapot(0.2);
+        gl.glEnable(GL_TEXTURE_2D);
+        head.bind(gl);
+        head.setTexParameteri(gl, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        head.setTexParameteri(gl, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+        gl.glBegin(GL_QUADS);
+        gl.glNormal3f(1,0,0);
+        gl.glTexCoord2f(0,0);
+        gl.glVertex3f(0.18f,0.05f,0.1f);
+        gl.glTexCoord2f(0,1);
+        gl.glVertex3f(0.18f,0.0f,0.1f);
+        gl.glTexCoord2f(1,1);
+        gl.glVertex3f(0.18f,0.0f,0.05f);
+        gl.glTexCoord2f(1,0);
+        gl.glVertex3f(0.18f,0.05f,0.05f);
+        gl.glEnd();
+        
+        gl.glBegin(GL_QUADS);
+        gl.glNormal3f(1,0,0);
+        gl.glTexCoord2f(0,0);
+        gl.glVertex3f(0.18f,0.05f,-0.1f);
+        gl.glTexCoord2f(0,1);
+        gl.glVertex3f(0.18f,0.0f,-0.1f);
+        gl.glTexCoord2f(1,1);
+        gl.glVertex3f(0.18f,0.0f,-0.05f);
+        gl.glTexCoord2f(1,0);
+        gl.glVertex3f(0.18f,0.05f,-0.05f);
+        gl.glEnd();
         gl.glPopMatrix();
+        gl.glDisable(GL_TEXTURE_2D);
         
         //Torso
         gl.glPushMatrix();
