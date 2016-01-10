@@ -4,13 +4,8 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import static java.lang.Math.*;
-import static javax.media.opengl.GL.GL_LINEAR;
-import static javax.media.opengl.GL.GL_REPEAT;
-import static javax.media.opengl.GL.GL_TEXTURE_2D;
-import static javax.media.opengl.GL.GL_TEXTURE_MAG_FILTER;
-import static javax.media.opengl.GL.GL_TEXTURE_MIN_FILTER;
-import static javax.media.opengl.GL.GL_TEXTURE_WRAP_S;
-import static javax.media.opengl.GL.GL_TEXTURE_WRAP_T;
+import static javax.media.opengl.GL.*;
+import static robotrace.Base.brick;
 import static robotrace.Base.track;
 
 /**
@@ -69,13 +64,23 @@ class RaceTrack {
             }
             gl.glColor3f(0, 0, 0);
             gl.glEnd();
+            brick.bind(gl);
+            brick.setTexParameteri(gl, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            brick.setTexParameteri(gl, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            brick.setTexParameteri(gl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            brick.setTexParameteri(gl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
                 float x1 = (float) (getPoint(i).x - (2 * laneWidth * getTangent(i).y));
                 float y1 = (float) (getPoint(i).y + (2 * laneWidth * getTangent(i).x));
                 
+                gl.glNormal3d(-getTangent(i).y,getTangent(i).x,0);
+                gl.glTexCoord2f((float)(200*i),0.0f);
                 gl.glVertex3f(x1,y1,1);
+                gl.glTexCoord2f((float)(200*i),8f);
                 gl.glVertex3f(x1,y1,-1);
             }
             gl.glEnd();
@@ -85,7 +90,10 @@ class RaceTrack {
                 float x2 = (float) (getPoint(i).x + (2 * laneWidth * getTangent(i).y));
                 float y2 = (float) (getPoint(i).y - (2 * laneWidth * getTangent(i).x));
                 
+                gl.glNormal3d(getTangent(i).y,-getTangent(i).x,0);
+                gl.glTexCoord2f((float)(200*i),0.0f);
                 gl.glVertex3f(x2,y2,1);
+                gl.glTexCoord2f((float)(200*i),8f);
                 gl.glVertex3f(x2,y2,-1);
             }
             gl.glColor3f(0, 0, 0);

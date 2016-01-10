@@ -7,6 +7,7 @@ import java.nio.*;
 import java.util.*;
 import static javax.media.opengl.GL.*;
 import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2GL3.*;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_COLOR_MATERIAL;
 import javax.media.opengl.glu.GLU;
 
@@ -70,15 +71,16 @@ class Terrain {
      */
     public void draw(GL2 gl, GLU glu, GLUT glut) {
         gl.glDisable(GL_COLOR_MATERIAL);
-        gl.glEnable(GL_TEXTURE_2D);
-        gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, bb);
+        gl.glDisable(GL_TEXTURE_2D);
+        gl.glEnable(GL_TEXTURE_1D);
+        gl.glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, bb);
 
 
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        gl.glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        gl.glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        gl.glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        gl.glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
         int mapSize = 41;
         gl.glPushMatrix();
@@ -87,30 +89,30 @@ class Terrain {
             for(float y = 0; y < mapSize-1; y+=0.25){
                 gl.glNormal3f((float) (-(heightAt(x+0.25f,y)-heightAt(x,y))*0.25), (float)(-(heightAt(x,y+0.25f)-heightAt(x,y))*0.25), 0.25f*0.25f);
                 
-                gl.glTexCoord2f((heightAt(x, y)+1)/2, 0.0f);
+                gl.glTexCoord1f((heightAt(x, y)+1)/2);
                 gl.glVertex3f(x-21, y-21, heightAt(x, y));
                 
-                gl.glTexCoord2f((heightAt(x+0.25f, y)+1)/2, 0.0f);
+                gl.glTexCoord1f((heightAt(x+0.25f, y)+1)/2);
                 gl.glVertex3f(x-20.75f, y-21, heightAt(x+0.25f, y));
                 
-                gl.glTexCoord2f((heightAt(x, y+0.25f)+1)/2, 1.0f);
+                gl.glTexCoord1f((heightAt(x, y+0.25f)+1)/2);
                 gl.glVertex3f(x-21, y-20.75f, heightAt(x, y+0.25f));
                 
                 gl.glNormal3f((float) (0.25f*(heightAt(x,y+0.25f)-heightAt(x+0.25f,y+0.25f))),(float)(-(heightAt(x+0.25f,y)-heightAt(x+0.25f,y+0.25f))*-0.25f),-0.25f*-0.25f);
                 
-                gl.glTexCoord2f((heightAt(x+0.25f, y+0.25f)+1)/2, 1.0f);
+                gl.glTexCoord1f((heightAt(x+0.25f, y+0.25f)+1)/2);
                 gl.glVertex3f(x-20.75f, y-20.75f, heightAt(x+0.25f, y+0.25f));
 
-                gl.glTexCoord2f((heightAt(x+0.25f, y)+1)/2, 0.0f);
+                gl.glTexCoord1f((heightAt(x+0.25f, y)+1)/2);
                 gl.glVertex3f(x-20.75f, y-21, heightAt(x+0.25f, y));
 
-                gl.glTexCoord2f((heightAt(x, y+0.25f)+1)/2, 1.0f);
+                gl.glTexCoord1f((heightAt(x, y+0.25f)+1)/2);
                 gl.glVertex3f(x-21, y-20.75f, heightAt(x, y+0.25f));
             }
         }
         gl.glEnd();
         gl.glPopMatrix();
-        gl.glDisable(GL_TEXTURE_2D);
+        gl.glDisable(GL_TEXTURE_1D);
         gl.glEnable(GL_COLOR_MATERIAL);
         gl.glEnable(GL_BLEND);
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
