@@ -51,10 +51,10 @@ class RaceTrack {
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
-                float x1 = (float) (getPoint(i).x - (2 * laneWidth * getTangent(i).y));
-                float y1 = (float) (getPoint(i).y + (2 * laneWidth * getTangent(i).x));
-                float x2 = (float) (getPoint(i).x + (2 * laneWidth * getTangent(i).y));
-                float y2 = (float) (getPoint(i).y - (2 * laneWidth * getTangent(i).x));
+                float x1 = (float) (getTestPoint(i).x - (2 * laneWidth * getTestTangent(i).y));
+                float y1 = (float) (getTestPoint(i).y + (2 * laneWidth * getTestTangent(i).x));
+                float x2 = (float) (getTestPoint(i).x + (2 * laneWidth * getTestTangent(i).y));
+                float y2 = (float) (getTestPoint(i).y - (2 * laneWidth * getTestTangent(i).x));
                 
                 gl.glNormal3f(0, 0, 1);
                 gl.glTexCoord2f(0,0);
@@ -74,10 +74,10 @@ class RaceTrack {
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
-                float x1 = (float) (getPoint(i).x - (2 * laneWidth * getTangent(i).y));
-                float y1 = (float) (getPoint(i).y + (2 * laneWidth * getTangent(i).x));
+                float x1 = (float) (getTestPoint(i).x - (2 * laneWidth * getTestTangent(i).y));
+                float y1 = (float) (getTestPoint(i).y + (2 * laneWidth * getTestTangent(i).x));
                 
-                gl.glNormal3d(-getTangent(i).y,getTangent(i).x,0);
+                gl.glNormal3d(-getTestTangent(i).y,getTestTangent(i).x,0);
                 gl.glTexCoord2f((float)(200*i),0.0f);
                 gl.glVertex3f(x1,y1,1);
                 gl.glTexCoord2f((float)(200*i),8f);
@@ -87,10 +87,10 @@ class RaceTrack {
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
-                float x2 = (float) (getPoint(i).x + (2 * laneWidth * getTangent(i).y));
-                float y2 = (float) (getPoint(i).y - (2 * laneWidth * getTangent(i).x));
+                float x2 = (float) (getTestPoint(i).x + (2 * laneWidth * getTestTangent(i).y));
+                float y2 = (float) (getTestPoint(i).y - (2 * laneWidth * getTestTangent(i).x));
                 
-                gl.glNormal3d(getTangent(i).y,-getTangent(i).x,0);
+                gl.glNormal3d(getTestTangent(i).y,-getTestTangent(i).x,0);
                 gl.glTexCoord2f((float)(200*i),0.0f);
                 gl.glVertex3f(x2,y2,1);
                 gl.glTexCoord2f((float)(200*i),8f);
@@ -102,22 +102,27 @@ class RaceTrack {
             // draw the spline track
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
-            for(double i = 0; i<1.01; i+=0.01){
-                Vector[] c = controlPoints;
-                Vector v = getCubicBezierPoint(i, c[0], c[1], c[2], c[3]);
-                Vector t = getCubicBezierTangent(i, c[0], c[1], c[2], c[3]);
-                
-                float x1 = (float) (v.x - (2 * laneWidth * t.y));
-                float y1 = (float) (v.y + (2 * laneWidth * t.x));
-                float x2 = (float) (v.x + (2 * laneWidth * t.y));
-                float y2 = (float) (v.y - (2 * laneWidth * t.x));
-                
-                gl.glNormal3f(0, 0, 1);
-                gl.glTexCoord2f(0,0);
-                gl.glVertex3f(x1,y1,1);
-                gl.glTexCoord2f(1,0);
-                gl.glVertex3f(x2,y2,1);
+            int n = 0;
+            while(n + 3 <= controlPoints.length){
+                    for(double i = 0; i<1.01; i+=0.01){
+                    Vector[] c = controlPoints;
+                    Vector v = getCubicBezierPoint(i, c[n], c[n + 1], c[n + 2], c[n + 3]);
+                    Vector t = getCubicBezierTangent(i, c[n], c[n + 1], c[n + 2], c[n + 3]);
+
+                    float x1 = (float) (v.x - (2 * laneWidth * t.y));
+                    float y1 = (float) (v.y + (2 * laneWidth * t.x));
+                    float x2 = (float) (v.x + (2 * laneWidth * t.y));
+                    float y2 = (float) (v.y - (2 * laneWidth * t.x));
+
+                    gl.glNormal3f(0, 0, 1);
+                    gl.glTexCoord2f(0,0);
+                    gl.glVertex3f(x1,y1,1);
+                    gl.glTexCoord2f(1,0);
+                    gl.glVertex3f(x2,y2,1);
+                }
+                n += 3;
             }
+            
             gl.glColor3f(0, 0, 0);
             gl.glEnd();
         }
@@ -129,8 +134,8 @@ class RaceTrack {
      */
     public Vector getLanePoint(int lane, double t) {
         if (null == controlPoints) {
-            float x = (float) (getPoint(t).x + ((-1.5 + lane) * laneWidth * getTangent(t).y));
-            float y = (float) (getPoint(t).y - ((-1.5 + lane) * laneWidth * getTangent(t).x));
+            float x = (float) (getTestPoint(t).x + ((-1.5 + lane) * laneWidth * getTestTangent(t).y));
+            float y = (float) (getTestPoint(t).y - ((-1.5 + lane) * laneWidth * getTestTangent(t).x));
             Vector lanePoint = new Vector(x,y,1);
             return lanePoint;
         } else {
@@ -144,7 +149,7 @@ class RaceTrack {
      */
     public Vector getLaneTangent(int lane, double t) {
         if (null == controlPoints) {
-            return getTangent(t);
+            return getTestTangent(t);
         } else {
             return Vector.O; // <- code goes here
         }
@@ -153,7 +158,7 @@ class RaceTrack {
     /**
      * Returns a point on the test track at 0 <= t < 1.
      */
-    private Vector getPoint(double t) {
+    private Vector getTestPoint(double t) {
         double pointX = 10*cos(PI*2*t);
         double pointY = 14*sin(PI*2*t);
         Vector point = new Vector(pointX,pointY,1);
@@ -163,7 +168,7 @@ class RaceTrack {
     /**
      * Returns a tangent on the test track at 0 <= t < 1.
      */
-    private Vector getTangent(double t) {
+    private Vector getTestTangent(double t) {
         double tangentX = -20*PI*sin(PI*2*t)/sqrt(pow(-20*PI*sin(PI*2*t),2)+pow(28*PI*cos(PI*2*t),2));
         double tangentY = 28*PI*cos(PI*2*t)/sqrt(pow(-20*PI*sin(PI*2*t),2)+pow(28*PI*cos(PI*2*t),2));
         Vector tangent = new Vector(tangentX,tangentY,0);
