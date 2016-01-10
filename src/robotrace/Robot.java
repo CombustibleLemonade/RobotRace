@@ -238,7 +238,6 @@ class Robot {
     }
 }
 
-
 class IKhelper{
     public double length1;
     public double length2;

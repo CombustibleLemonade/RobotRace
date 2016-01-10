@@ -89,9 +89,7 @@ class RaceTrack {
                 gl.glVertex3f(x2,y2,-1);
             }
             gl.glColor3f(0, 0, 0);
-            gl.glEnd();
-            
-            
+            gl.glEnd();            
         } else {
             // draw the spline track
         }
@@ -150,7 +148,19 @@ class RaceTrack {
      */
     private Vector getCubicBezierPoint(double t, Vector P0, Vector P1,
                                                  Vector P2, Vector P3) {
-        return Vector.O; // <- code goes here
+        // C0-3 are the coefficients
+        Vector c0 = P0.scale(Math.pow(1-t, 3));
+        Vector c1 = P1.scale(3 * t * Math.pow(1-t, 2));
+        Vector c2 = P2.scale(3 * t * t * (1-t));
+        Vector c3 = P3.scale(t * t * t);
+
+        // sum is the sum of all coefficients
+        Vector sum = Vector.O;
+        sum.add(c0);
+        sum.add(c1);
+        sum.add(c2);
+        sum.add(c3);
+        return sum;
     }
     
     /**
@@ -159,6 +169,19 @@ class RaceTrack {
      */
     private Vector getCubicBezierTangent(double t, Vector P0, Vector P1,
                                                    Vector P2, Vector P3) {
-        return Vector.O; // <- code goes here
+        // This basically is the gradient of the getCubicBezierPoint method
+        // C0-3 are the coefficients, and derivatives of getCubicBezierPoint coefficients
+        Vector c0 = P0.scale(-Math.pow(1-t, 2)); //
+        Vector c1 = P1.scale(3 * Math.pow(1-t, 2) - 3 * t * (1-t));
+        Vector c2 = P2.scale(6 * t * (1-t) - 3 * t * t);
+        Vector c3 = P3.scale(3 * t * t);
+
+        // sum is the sum of all coefficients
+        Vector sum = Vector.O;
+        sum.add(c0);
+        sum.add(c1);
+        sum.add(c2);
+        sum.add(c3);
+        return sum;    
     }
 }
