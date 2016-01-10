@@ -102,11 +102,15 @@ class RaceTrack {
             // draw the spline track
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
-            for(double i = 0; i<1.01; i+=0.05){
-                float x1 = (float) (getPoint(i).x - (2 * laneWidth * getTangent(i).y));
-                float y1 = (float) (getPoint(i).y + (2 * laneWidth * getTangent(i).x));
-                float x2 = (float) (getPoint(i).x + (2 * laneWidth * getTangent(i).y));
-                float y2 = (float) (getPoint(i).y - (2 * laneWidth * getTangent(i).x));
+            for(double i = 0; i<1.01; i+=0.01){
+                Vector[] c = controlPoints;
+                Vector v = getCubicBezierPoint(i, c[0], c[1], c[2], c[3]);
+                Vector t = getCubicBezierTangent(i, c[0], c[1], c[2], c[3]);
+                
+                float x1 = (float) (v.x - (2 * laneWidth * t.y));
+                float y1 = (float) (v.y + (2 * laneWidth * t.x));
+                float x2 = (float) (v.x + (2 * laneWidth * t.y));
+                float y2 = (float) (v.y - (2 * laneWidth * t.x));
                 
                 gl.glNormal3f(0, 0, 1);
                 gl.glTexCoord2f(0,0);
@@ -177,13 +181,13 @@ class RaceTrack {
         Vector c1 = P1.scale(3 * t * Math.pow(1-t, 2));
         Vector c2 = P2.scale(3 * t * t * (1-t));
         Vector c3 = P3.scale(t * t * t);
-
+        
         // sum is the sum of all coefficients
-        Vector sum = Vector.O;
-        sum.add(c0);
-        sum.add(c1);
-        sum.add(c2);
-        sum.add(c3);
+        Vector sum = new Vector(0, 0, 0);
+        sum = sum.add(c0);
+        sum = sum.add(c1);
+        sum = sum.add(c2);
+        sum = sum.add(c3);
         return sum;
     }
     
@@ -202,10 +206,10 @@ class RaceTrack {
 
         // sum is the sum of all coefficients
         Vector sum = Vector.O;
-        sum.add(c0);
-        sum.add(c1);
-        sum.add(c2);
-        sum.add(c3);
-        return sum;    
+        sum = sum.add(c0);
+        sum = sum.add(c1);
+        sum = sum.add(c2);
+        sum = sum.add(c3);
+        return sum.normalized();    
     }
 }

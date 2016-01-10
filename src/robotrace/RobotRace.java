@@ -106,6 +106,11 @@ public class RobotRace extends Base {
             new Vector(10, 0, 1), new Vector(10, 5, 1), new Vector(5, 10, 1),
             new Vector(..., ..., ...), ...
             */
+            // TODO
+            new Vector(0, -10, 0),
+            new Vector(10, -10, 0),
+            new Vector(10, 10, 0),
+            new Vector(0, 10, 0)
         });
         
         // L-track
