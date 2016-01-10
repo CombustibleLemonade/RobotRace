@@ -4,6 +4,14 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import static java.lang.Math.*;
+import static javax.media.opengl.GL.GL_LINEAR;
+import static javax.media.opengl.GL.GL_REPEAT;
+import static javax.media.opengl.GL.GL_TEXTURE_2D;
+import static javax.media.opengl.GL.GL_TEXTURE_MAG_FILTER;
+import static javax.media.opengl.GL.GL_TEXTURE_MIN_FILTER;
+import static javax.media.opengl.GL.GL_TEXTURE_WRAP_S;
+import static javax.media.opengl.GL.GL_TEXTURE_WRAP_T;
+import static robotrace.Base.track;
 
 /**
  * Implementation of a race track that is made from Bezier segments.
@@ -35,8 +43,15 @@ class RaceTrack {
     public void draw(GL2 gl, GLU glu, GLUT glut) {
         if (null == controlPoints) {
             // draw the test track
-            gl.glColor3f(0, 0, 1);
-            gl.glBegin(gl.GL_QUAD_STRIP);
+            gl.glColor3f(1f,1f,1f);
+            gl.glEnable(GL2.GL_TEXTURE_2D);
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            track.bind(gl);
+            gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
                 float x1 = (float) (getPoint(i).x - (2 * laneWidth * getTangent(i).y));
@@ -44,12 +59,15 @@ class RaceTrack {
                 float x2 = (float) (getPoint(i).x + (2 * laneWidth * getTangent(i).y));
                 float y2 = (float) (getPoint(i).y - (2 * laneWidth * getTangent(i).x));
                 
+                gl.glNormal3f(0, 0, 1);
+                gl.glTexCoord2f(0,0);
                 gl.glVertex3f(x1,y1,1);
+                gl.glTexCoord2f(1,0);
                 gl.glVertex3f(x2,y2,1);
             }
             gl.glColor3f(0, 0, 0);
             gl.glEnd();
-            gl.glBegin(gl.GL_QUAD_STRIP);
+            gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
                 float x1 = (float) (getPoint(i).x - (2 * laneWidth * getTangent(i).y));
@@ -59,7 +77,7 @@ class RaceTrack {
                 gl.glVertex3f(x1,y1,-1);
             }
             gl.glEnd();
-            gl.glBegin(gl.GL_QUAD_STRIP);
+            gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
                 float x2 = (float) (getPoint(i).x + (2 * laneWidth * getTangent(i).y));
