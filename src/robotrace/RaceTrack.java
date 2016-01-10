@@ -204,7 +204,7 @@ class RaceTrack {
                                                    Vector P2, Vector P3) {
         // This basically is the gradient of the getCubicBezierPoint method
         // C0-3 are the coefficients, and derivatives of getCubicBezierPoint coefficients
-        Vector c0 = P0.scale(-Math.pow(1-t, 2)); //
+        Vector c0 = P0.scale(-3 * Math.pow(1-t, 2)); //
         Vector c1 = P1.scale(3 * Math.pow(1-t, 2) - 3 * t * (1-t));
         Vector c2 = P2.scale(6 * t * (1-t) - 3 * t * t);
         Vector c3 = P3.scale(3 * t * t);
