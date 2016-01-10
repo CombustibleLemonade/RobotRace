@@ -47,6 +47,7 @@ class Terrain {
             21, 43, 18,
             21, 43, 18,
         };
+        
         for(int i = 0; i < 16; i++){
             colors[i] = new Color(terrainTexColors[(3*i)], terrainTexColors[(3*i)+1], terrainTexColors[(3*i)+2]);
         }

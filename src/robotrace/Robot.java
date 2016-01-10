@@ -27,8 +27,8 @@ class Robot {
     double armXOffset = 0.44;
     double legXOffset = 0.15;
     
-    double upperLegLength = 0.7;
-    double lowerLegLength = 0.75;
+    double upperLegLength = 0.65;
+    double lowerLegLength = 0.7;
     
     double legThickness = 0.27;
     double stickThickness = 0.05;
