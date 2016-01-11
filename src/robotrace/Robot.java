@@ -9,6 +9,7 @@ import static javax.media.opengl.GL2GL3.*;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.*;
 import javax.media.opengl.glu.GLU;
 import static robotrace.Base.head;
+import static robotrace.Base.torso;
 
 /**
 * Represents a Robot, to be implemented according to the Assignments.
@@ -234,7 +235,7 @@ class Robot {
         
         //Torso
         gl.glPushMatrix();
-
+        
         if (isStickFigure){
             gl.glTranslated(0.0, 0.0, 1.0);
             gl.glScaled(stickThickness, stickThickness, 1.0);
@@ -243,6 +244,22 @@ class Robot {
             gl.glTranslatef(0.0f, 0.0f, 1.3f);
             gl.glScalef(0.616f, 0.426f, 0.8f);
             glut.glutSolidCube(1.0f);
+            gl.glEnable(GL_TEXTURE_2D);
+            torso.bind(gl);
+            torso.setTexParameteri(gl, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            torso.setTexParameteri(gl, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            gl.glBegin(GL_QUADS);
+            gl.glNormal3f(0,-0.96f,-0.18f);
+            gl.glTexCoord2f(0, 0);
+            gl.glVertex3f(-0.3f,-0.55f,0.55f);
+            gl.glTexCoord2f(0,1);
+            gl.glVertex3f(-1f,-1.5f,-1f);
+            gl.glTexCoord2f(1,1);
+            gl.glVertex3f(1f,-1.5f,-1f);
+            gl.glTexCoord2f(1,0);
+            gl.glVertex3f(0.3f,-0.55f,0.55f);
+            gl.glEnd();
+            gl.glDisable(GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
         

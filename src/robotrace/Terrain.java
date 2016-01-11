@@ -80,8 +80,7 @@ class Terrain {
         gl.glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         
         gl.glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        gl.glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
+        
         int mapSize = 41;
         gl.glPushMatrix();
         gl.glBegin(GL_TRIANGLES);
@@ -90,24 +89,24 @@ class Terrain {
                 gl.glNormal3f((float) (-(heightAt(x+0.25f,y)-heightAt(x,y))*0.25), (float)(-(heightAt(x,y+0.25f)-heightAt(x,y))*0.25), 0.25f*0.25f);
                 
                 gl.glTexCoord1f((heightAt(x, y)+1)/2);
-                gl.glVertex3f(x-21, y-21, heightAt(x, y));
+                gl.glVertex3f(x-20, y-20, heightAt(x, y));
                 
                 gl.glTexCoord1f((heightAt(x+0.25f, y)+1)/2);
-                gl.glVertex3f(x-20.75f, y-21, heightAt(x+0.25f, y));
+                gl.glVertex3f(x-19.75f, y-20, heightAt(x+0.25f, y));
                 
                 gl.glTexCoord1f((heightAt(x, y+0.25f)+1)/2);
-                gl.glVertex3f(x-21, y-20.75f, heightAt(x, y+0.25f));
+                gl.glVertex3f(x-20, y-19.75f, heightAt(x, y+0.25f));
                 
                 gl.glNormal3f((float) (0.25f*(heightAt(x,y+0.25f)-heightAt(x+0.25f,y+0.25f))),(float)(-(heightAt(x+0.25f,y)-heightAt(x+0.25f,y+0.25f))*-0.25f),-0.25f*-0.25f);
                 
                 gl.glTexCoord1f((heightAt(x+0.25f, y+0.25f)+1)/2);
-                gl.glVertex3f(x-20.75f, y-20.75f, heightAt(x+0.25f, y+0.25f));
+                gl.glVertex3f(x-19.75f, y-19.75f, heightAt(x+0.25f, y+0.25f));
 
                 gl.glTexCoord1f((heightAt(x+0.25f, y)+1)/2);
-                gl.glVertex3f(x-20.75f, y-21, heightAt(x+0.25f, y));
+                gl.glVertex3f(x-19.75f, y-20, heightAt(x+0.25f, y));
 
                 gl.glTexCoord1f((heightAt(x, y+0.25f)+1)/2);
-                gl.glVertex3f(x-21, y-20.75f, heightAt(x, y+0.25f));
+                gl.glVertex3f(x-20, y-19.75f, heightAt(x, y+0.25f));
             }
         }
         gl.glEnd();
@@ -119,6 +118,7 @@ class Terrain {
         gl.glColor4f(166,166,166,0.2f);
         gl.glPushMatrix();
         gl.glBegin(GL2.GL_QUADS);
+        gl.glNormal3f(0,0,1);
         gl.glVertex3f(-21,-21,0);
         gl.glVertex3f(-21,21,0);
         gl.glVertex3f(21,21,0);

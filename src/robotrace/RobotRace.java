@@ -1,8 +1,6 @@
 package robotrace;
 import static java.lang.Math.*;
-import javax.media.opengl.GL;
 import static javax.media.opengl.GL2.*;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.*;
 
 /**
  * Handles all of the RobotRace graphics functionality,
@@ -324,5 +322,5 @@ public class RobotRace extends Base {
     public static void main(String args[]) {
         RobotRace robotRace = new RobotRace();
         robotRace.run();
-    } 
+    }
 }
