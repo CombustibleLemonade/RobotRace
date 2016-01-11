@@ -158,8 +158,23 @@ class Terrain {
         gl.glColor3f(0,0,0);
         gl.glPushMatrix();
         gl.glTranslatef(-19.5f,-19.5f,0);
-        gl.glRotatef(60f,0.0f,0.0f,1.0f);
-        drawTree(gl,glu,glut,initDepth,initDiam,initLength);
+        gl.glRotatef(60,0,0,1);
+        drawTree(gl,glu,glut,initDepth,initDiam,initLength,1);
+        gl.glPopMatrix();
+        gl.glPushMatrix();
+        gl.glTranslatef(-18f,-19f,0.2f);
+        gl.glRotatef(60,0,0,1);
+        drawTree(gl,glu,glut,6,0.2f,0.7f,4f);
+        gl.glPopMatrix();
+        gl.glPushMatrix();
+        gl.glTranslatef(-18.5f,-18.3f,0.2f);
+        gl.glRotatef(-60,0,0,1);
+        drawTree(gl,glu,glut,6,0.18f,0.6f,4f);
+        gl.glPopMatrix();
+        gl.glPushMatrix();
+        gl.glTranslatef(15f,12f,(heightAt(15,12)-0.2f));
+        gl.glRotatef(-160,0,0,1);
+        drawTree(gl,glu,glut,initDepth,initDiam,initLength,1);
         gl.glPopMatrix();
         gl.glDisable(GL_COLOR_MATERIAL);
         gl.glEnable(GL_LIGHTING);
@@ -298,7 +313,7 @@ class Terrain {
         return (float) (r.nextFloat()*2*v - v);
     }
     
-    public void drawTree(GL2 gl, GLU glu, GLUT glut, int depth, float diam, float length){
+    public void drawTree(GL2 gl, GLU glu, GLUT glut, int depth, float diam, float length, float size){
         if(depth>0){
             //Set color and draw branch then translate to the end of last branch
             gl.glDisable(GL_TEXTURE_2D);
@@ -313,6 +328,7 @@ class Terrain {
             if(depth ==1){
             gl.glColor3f(32f/255f,65f/255f,0);
             gl.glRotatef(45f,1.0f,1.0f,0.0f);
+            gl.glScalef(1/size,1/size,1/size);
             gl.glBegin(GL_LINES);
             gl.glVertex3f(0.0f,0.0f,0.0f);
             gl.glVertex3f(-0.5f,0.5f,0.0f);
@@ -352,11 +368,11 @@ class Terrain {
             
             gl.glPushMatrix();
             gl.glRotatef(angle[(2*depth)-1], 0.3f,0.0f,0.5f);
-            drawTree(gl,glu,glut,depth-1,diam,length);
+            drawTree(gl,glu,glut,depth-1,diam,length,size);
             gl.glPopMatrix();
             gl.glPushMatrix();
             gl.glRotatef(angle[(2*depth)-2], -0.7f,0.0f,-1.0f);
-            drawTree(gl,glu,glut,depth-1,diam,length);
+            drawTree(gl,glu,glut,depth-1,diam,length,size);
             gl.glPopMatrix();
         }
     }
