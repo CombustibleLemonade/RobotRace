@@ -9,6 +9,7 @@ import static javax.media.opengl.GL.*;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2GL3.*;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_COLOR_MATERIAL;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 import javax.media.opengl.glu.GLU;
 
 /**
@@ -136,11 +137,12 @@ class Terrain {
         }
         gl.glEnd();
         gl.glPopMatrix();
+        
         gl.glDisable(GL_TEXTURE_1D);
         gl.glEnable(GL_COLOR_MATERIAL);
         gl.glEnable(GL_BLEND);
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        gl.glColor4f(166,166,166,0.2f);
+        gl.glColor4f(166,166,166,0.25f);
         gl.glPushMatrix();
         gl.glBegin(GL2.GL_QUADS);
         gl.glNormal3f(0,0,1);
@@ -152,6 +154,7 @@ class Terrain {
         gl.glPopMatrix();
         gl.glDisable(GL_BLEND);
         
+        gl.glDisable(GL_LIGHTING);
         gl.glColor3f(0,0,0);
         gl.glPushMatrix();
         gl.glTranslatef(-19.5f,-19.5f,0);
@@ -159,6 +162,7 @@ class Terrain {
         drawTree(gl,glu,glut,initDepth,initDiam,initLength);
         gl.glPopMatrix();
         gl.glDisable(GL_COLOR_MATERIAL);
+        gl.glEnable(GL_LIGHTING);
     }
 
     /**
@@ -298,6 +302,8 @@ class Terrain {
         if(depth>0){
             //Set color and draw branch then translate to the end of last branch
             gl.glDisable(GL_TEXTURE_2D);
+            gl.glDisable(GL_TEXTURE_1D);
+            gl.glEnable(GL_COLOR_MATERIAL);
             
             gl.glColor3d(83.0/255.0, 48.0/255.0, 24.0/255.0);
             glut.glutSolidCylinder(diam/2, length, 20, 10);
@@ -305,14 +311,37 @@ class Terrain {
 
             
             if(depth ==1){
-            gl.glColor3f(71/255,144/255,0);
+            gl.glColor3f(32f/255f,65f/255f,0);
             gl.glRotatef(45f,1.0f,1.0f,0.0f);
+            gl.glBegin(GL_LINES);
+            gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(-0.5f,0.5f,0.0f);
+            gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(-0.3f,0.4f,0.0f);
+            gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(-0.2f,0.7f,0.0f);
+            gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(0.05f,0.6f,0.0f);
+            gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(0.15f,0.35f,0.0f);
+            gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(0.3f,0.45f,0.0f);
+            gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(0.2f,0.15f,0.0f);
+            
+            gl.glEnd();
+            
+            gl.glColor3f(71f/255f,144f/255f,0);
             gl.glBegin(GL2.GL_POLYGON);
             gl.glNormal3f(0,0,1);
             gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(-0.5f,0.5f,0.0f);
             gl.glVertex3f(-0.3f,0.4f,0.0f);
+            gl.glVertex3f(-0.2f,0.7f,0.0f);
             gl.glVertex3f(0.05f,0.6f,0.0f);
-            gl.glVertex3f(0.3f,0.35f,0.0f);
+            gl.glVertex3f(0.15f,0.35f,0.0f);
+            gl.glVertex3f(0.3f,0.45f,0.0f);
+            gl.glVertex3f(0.2f,0.15f,0.0f);
             gl.glEnd();
             }
             length = (float) (length*lengthDiamDiff[depth-1]);
