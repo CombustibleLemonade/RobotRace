@@ -15,7 +15,9 @@ class RaceTrack {
     
     /** The width of one lane. The total width of the track is 4 * laneWidth. */
     private final static float laneWidth = 1.22f;
-
+    
+    public Robot robots[] = new Robot[4];
+    
     /** Array with 3N control points, where N is the number of segments. */
     private Vector[] controlPoints = null;
     

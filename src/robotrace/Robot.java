@@ -25,7 +25,13 @@ class Robot {
     public boolean isStickFigure = false;
     
     /** How far we've traversed the track so far */
-    public float distanceTravelled = 0.0f;
+    public double distanceTravelled = 0.0;
+    
+    /** How much we deviate from the standard distance traveled. */
+    public double deviation = 0.0;
+    
+    /** How much we deviate from the standard distance traveled per second */
+    public double ddeviation = 0.0;
     
     /** The material from which this robot is built. */
     private final Material material;

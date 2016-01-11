@@ -1,5 +1,7 @@
 package robotrace;
 
+import java.util.Random;
+
 /**
  * Implementation of a camera with a position and orientation. 
  */
@@ -22,24 +24,51 @@ class Camera {
      * selected camera mode.
      */
     public void update(GlobalState gs, Robot focus) {
-
-        switch (gs.camMode) {    
+        Robot robots[] = raceTrack.robots;
+        switch (gs.camMode) { 
             // Helicopter mode
             case 1:
+                // Get the leading robot
+                double maxDTravel = 0.0;
+                for (Robot i : robots){
+                    if (i.distanceTravelled > maxDTravel){
+                        focus = i;
+                        maxDTravel = i.distanceTravelled;
+                    }
+                }
+                // Set the camera
                 setHelicopterMode(gs, focus);
                 break;
                 
             // Motor cycle mode    
             case 2:
+                // Get the leading robot
+                maxDTravel = 0.0;
+                for (Robot i : robots){
+                    if (i.distanceTravelled > maxDTravel){
+                        focus = i;
+                        maxDTravel = i.distanceTravelled;
+                    }
+                }
+                // Set the camera
                 setMotorCycleMode(gs, focus);
                 break;
                 
             // First person mode    
             case 3:
+                // Get the losing robot
+                maxDTravel = robots[0].distanceTravelled;
+                for (Robot i : robots){
+                    if (i.distanceTravelled <= maxDTravel){
+                        focus = i;
+                        maxDTravel = i.distanceTravelled;
+                    }
+                }
+                
                 setFirstPersonMode(gs, focus);
                 break;
                 
-            // Auto mode    
+            // Auto mode
             case 4:
                 setAutoMode(gs, focus);
                 break;
@@ -77,9 +106,13 @@ class Camera {
      * The camera should focus on the robot.
      */
     private void setMotorCycleMode(GlobalState gs, Robot focus) {
-        eye = raceTrack.getLanePoint(1, focus.distanceTravelled);
-        eye.z += 1.2;
+        // We position the camera behind the focus
+        eye = raceTrack.getLanePoint(1, focus.distanceTravelled - 2);
+        eye.z += 1.5;
+        
+        // And look at the leading robot
         center = focus.position;
+        center.z += 1.2;
     }
 
     /**
@@ -87,15 +120,44 @@ class Camera {
      * The camera should view from the perspective of the robot.
      */
     private void setFirstPersonMode(GlobalState gs, Robot focus) {
-        // code goes here ...
+        // The camera is positioned in the head of the robot
+        eye = focus.position;
+        eye.z += 1.7;
+        
+        // And the camera looks in the same direction as the robot
+        center = focus.position.add(focus.direction);
+        center.z += 1.7;
     }
     
     /**
      * Computes eye, center, and up, based on the auto mode.
      * The above modes are alternated.
      */
+    int autoCamMode = 1;
     private void setAutoMode(GlobalState gs, Robot focus) {
-        // code goes here ...
+        Random r = new Random();
+        if(r.nextDouble() < 0.01){
+            autoCamMode = r.nextInt(4);
+        }
+        
+        switch (autoCamMode) {    
+            // Helicopter mode
+            case 1:
+                setHelicopterMode(gs, focus);
+                break;
+                
+            // Motor cycle mode    
+            case 2:
+                setMotorCycleMode(gs, focus);
+                break;
+                
+            // First person mode    
+            case 3:
+                setFirstPersonMode(gs, focus);
+                break;
+            
+            default:
+                setDefaultMode(gs);
+        }
     }
-
 }

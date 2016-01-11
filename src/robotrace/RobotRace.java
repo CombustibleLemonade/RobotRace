@@ -1,6 +1,28 @@
 package robotrace;
 import static java.lang.Math.*;
+import java.util.Random;
+import static javax.media.opengl.GL.GL_BLEND;
+import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
+import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
+import static javax.media.opengl.GL.GL_DEPTH_TEST;
+import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
+import static javax.media.opengl.GL.GL_LESS;
+import static javax.media.opengl.GL.GL_NICEST;
+import static javax.media.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
+import static javax.media.opengl.GL.GL_SRC_ALPHA;
+import static javax.media.opengl.GL.GL_TEXTURE_2D;
 import static javax.media.opengl.GL2.*;
+import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
+import static javax.media.opengl.GL2GL3.GL_FILL;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_COLOR_MATERIAL;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_DIFFUSE;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHT0;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_NORMALIZE;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_POSITION;
+import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
+import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 /**
  * Handles all of the RobotRace graphics functionality,
@@ -244,6 +266,7 @@ public class RobotRace extends Base {
      * Draws the entire scene.
      */
     @Override
+    @SuppressWarnings("empty-statement")
     public void drawScene() {
         // Background color.
         gl.glClearColor(1f, 1f, 1f, 0f);
@@ -273,6 +296,13 @@ public class RobotRace extends Base {
         float z = (float) sin(gs.phi + ((1/18)* PI));
         float lightPos[] = { x, y, z, 0.0f };
         
+        if(gs.camMode != 0){
+            lightPos[0] = 0.1f;
+            lightPos[1] = 0.1f;
+            lightPos[2] = 1.0f;
+            lightPos[3] = 0.0f;
+        }
+        
         float[] ambient= { 0.2f, 0.2f, 0.2f, 1.0f};
         float[] diffuse = {1.0f, 1.0f, 1.0f, 1.0f};
         
@@ -288,23 +318,33 @@ public class RobotRace extends Base {
         
         // Get the position and direction of the robots.
         double t = gs.tAnim;
-        
+        Random r = new Random();
         for (int i=0; i < robots.length; i++){
-            robots[i].position = raceTracks[gs.trackNr].getLanePoint(i, t);
-            robots[i].direction = raceTracks[gs.trackNr].getLaneTangent(i, t);
+            robots[i].distanceTravelled = t + robots[i].deviation;
+            // Set the position and direction of the robot
+            robots[i].position = raceTracks[gs.trackNr].getLanePoint(i, robots[i].distanceTravelled);
+            robots[i].direction = raceTracks[gs.trackNr].getLaneTangent(i, robots[i].distanceTravelled);
+            // Draw the robot
+            robots[i].draw(gl, glu, glut, gs.showStick, (float) robots[i].distanceTravelled);
+            // Add some randomness in the robots movement
+            robots[i].ddeviation += (r.nextDouble() - 0.49) * 0.01;
+            robots[i].deviation += robots[i].ddeviation;
+            
+            // Add some damping effect on deviation
+            if(robots[i].ddeviation > 0.1){
+                robots[i].ddeviation = 0.01;
+            } else if (robots[i].ddeviation < 0){
+                robots[i].ddeviation = 0.05;
+            }
+            
+            raceTracks[gs.trackNr].robots[i] = robots[i];
         }
         
-        // Draw the robots.        
-        robots[0].draw(gl, glu, glut, gs.showStick, gs.tAnim);
-        robots[1].draw(gl, glu, glut, gs.showStick, gs.tAnim);
-        robots[2].draw(gl, glu, glut, gs.showStick, gs.tAnim);
-        robots[3].draw(gl, glu, glut, gs.showStick, gs.tAnim);
-        
-        gl.glEnable(GL_COLOR_MATERIAL);
         // Draw the race track.
+        gl.glEnable(GL_COLOR_MATERIAL);
         raceTracks[gs.trackNr].draw(gl, glu, glut);
-        
         gl.glDisable(GL_COLOR_MATERIAL);
+        
         // Draw the terrain.
         terrain.draw(gl, glu, glut);
     }
