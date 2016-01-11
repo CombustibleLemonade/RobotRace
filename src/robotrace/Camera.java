@@ -30,7 +30,9 @@ class Camera {
             case 1:
                 // Get the leading robot
                 double maxDTravel = 0.0;
+                
                 for (Robot i : robots){
+                    if (i == null){break;}
                     if (i.distanceTravelled > maxDTravel){
                         focus = i;
                         maxDTravel = i.distanceTravelled;
