@@ -99,7 +99,7 @@ class Camera {
      */
     private void setHelicopterMode(GlobalState gs, Robot focus) {
         // eye = focus.position;
-        eye = focus.position.add(new Vector(0.1, 0.1, 6));
+        eye = focus.position.add(new Vector(0.1, 0.1, 13));
         center = focus.position;
     }
 
