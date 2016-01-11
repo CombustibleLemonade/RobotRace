@@ -340,6 +340,24 @@ public class RobotRace extends Base {
             raceTracks[gs.trackNr].robots[i] = robots[i];
         }
         
+        Robot slowest = robots[0]; // Slowest robot
+        Robot fastest = robots[0]; // Fastest robot
+        for (Robot i : robots){
+            if (i.deviation < slowest.deviation){
+                slowest = i;
+            }
+            if (i.deviation > fastest.deviation){
+                fastest = i;
+            }
+        }
+        
+        if (slowest.ddeviation < 0.09){
+            slowest.ddeviation += 0.005; // Speed up the slowest
+        }
+        if (fastest.ddeviation > 0.01){
+            fastest.ddeviation -= 0.001;
+        }
+        
         // Draw the race track.
         gl.glEnable(GL_COLOR_MATERIAL);
         raceTracks[gs.trackNr].draw(gl, glu, glut);

@@ -215,7 +215,7 @@ class Robot {
         head.setTexParameteri(gl, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         head.setTexParameteri(gl, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-
+        // Eyes
         gl.glBegin(GL_QUADS);
         gl.glNormal3f(1,0,0);
         gl.glTexCoord2f(0,0);
@@ -257,8 +257,10 @@ class Robot {
             torso.bind(gl);
             torso.setTexParameteri(gl, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             torso.setTexParameteri(gl, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            
+            // Cape
             gl.glBegin(GL_QUADS);
-            gl.glNormal3f(0,-0.96f,-0.18f);
+            gl.glNormal3f(0,-0.27f,-0.57f);
             gl.glTexCoord2f(0, 0);
             gl.glVertex3f(-0.3f,-0.55f,0.55f);
             gl.glTexCoord2f(0,1);
@@ -296,6 +298,12 @@ class Robot {
     }
 }
 
+/**
+ * Inverse kinematics is used when a system of joints and rods are required
+ * to be placed at a certain target. Here we use two joints, the hip joint and
+ * the knee joint.
+ * @author s145358
+ */
 class IKhelper{
     public double length1;
     public double length2;
