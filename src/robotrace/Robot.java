@@ -260,7 +260,7 @@ class Robot {
             
             // Cape
             gl.glBegin(GL_QUADS);
-            gl.glNormal3f(0,-0.27f,-0.57f);
+            gl.glNormal3f(0, 0.27f, 0.57f);
             gl.glTexCoord2f(0, 0);
             gl.glVertex3f(-0.3f,-0.55f,0.55f);
             gl.glTexCoord2f(0,1);
