@@ -13,6 +13,9 @@ class Camera {
 
     /** The up vector. */
     public Vector up = Vector.Z;
+    
+    /** The racetrack we're on */
+    public RaceTrack raceTrack;
 
     /**
      * Updates the camera viewpoint and direction based on the
@@ -74,7 +77,9 @@ class Camera {
      * The camera should focus on the robot.
      */
     private void setMotorCycleMode(GlobalState gs, Robot focus) {
-        // code goes here ...
+        eye = raceTrack.getLanePoint(1, focus.distanceTravelled);
+        eye.z += 1.2;
+        center = focus.position;
     }
 
     /**

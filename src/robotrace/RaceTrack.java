@@ -51,10 +51,11 @@ class RaceTrack {
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
-                float x1 = (float) (getTestPoint(i).x - (2 * laneWidth * getTestTangent(i).y));
-                float y1 = (float) (getTestPoint(i).y + (2 * laneWidth * getTestTangent(i).x));
-                float x2 = (float) (getTestPoint(i).x + (2 * laneWidth * getTestTangent(i).y));
-                float y2 = (float) (getTestPoint(i).y - (2 * laneWidth * getTestTangent(i).x));
+                Vector t = getTestTangent(i).normalized();
+                float x1 = (float) (getTestPoint(i).x - (2 * laneWidth * t.y));
+                float y1 = (float) (getTestPoint(i).y + (2 * laneWidth * t.x));
+                float x2 = (float) (getTestPoint(i).x + (2 * laneWidth * t.y));
+                float y2 = (float) (getTestPoint(i).y - (2 * laneWidth * t.x));
                 
                 gl.glNormal3f(0, 0, 1);
                 gl.glTexCoord2f(0,0);
@@ -74,8 +75,9 @@ class RaceTrack {
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
-                float x1 = (float) (getTestPoint(i).x - (2 * laneWidth * getTestTangent(i).y));
-                float y1 = (float) (getTestPoint(i).y + (2 * laneWidth * getTestTangent(i).x));
+                Vector t = getTestTangent(i).normalized();
+                float x1 = (float) (getTestPoint(i).x - (2 * laneWidth * t.y));
+                float y1 = (float) (getTestPoint(i).y + (2 * laneWidth * t.x));
                 
                 gl.glNormal3d(-getTestTangent(i).y,getTestTangent(i).x,0);
                 gl.glTexCoord2f((float)(200*i),0.0f);
@@ -87,8 +89,9 @@ class RaceTrack {
             gl.glBegin(GL2.GL_QUAD_STRIP);
             
             for(double i = 0; i<1.01; i+=0.01){
-                float x2 = (float) (getTestPoint(i).x + (2 * laneWidth * getTestTangent(i).y));
-                float y2 = (float) (getTestPoint(i).y - (2 * laneWidth * getTestTangent(i).x));
+                Vector t = getTestTangent(i).normalized();
+                float x2 = (float) (getTestPoint(i).x + (2 * laneWidth * t.y));
+                float y2 = (float) (getTestPoint(i).y - (2 * laneWidth * t.x));
                 
                 gl.glNormal3d(getTestTangent(i).y,-getTestTangent(i).x,0);
                 gl.glTexCoord2f((float)(200*i),0.0f);
@@ -104,10 +107,11 @@ class RaceTrack {
             
             int n = 0;
             while(n + 3 <= controlPoints.length){
-                    for(double i = 0; i<1.01; i+=0.01){
-                    Vector[] c = controlPoints;
+                Vector[] c = controlPoints;
+                
+                for(double i = 0; i<1.01; i+=0.01){
                     Vector v = getCubicBezierPoint(i, c[n], c[n + 1], c[n + 2], c[n + 3]);
-                    Vector t = getCubicBezierTangent(i, c[n], c[n + 1], c[n + 2], c[n + 3]);
+                    Vector t = getCubicBezierTangent(i, c[n], c[n + 1], c[n + 2], c[n + 3]).normalized();
 
                     float x1 = (float) (v.x - (2 * laneWidth * t.y));
                     float y1 = (float) (v.y + (2 * laneWidth * t.x));
@@ -134,12 +138,42 @@ class RaceTrack {
      */
     public Vector getLanePoint(int lane, double t) {
         if (null == controlPoints) {
-            float x = (float) (getTestPoint(t).x + ((-1.5 + lane) * laneWidth * getTestTangent(t).y));
-            float y = (float) (getTestPoint(t).y - ((-1.5 + lane) * laneWidth * getTestTangent(t).x));
+            t *= 0.03;
+            Vector tangent = getTestTangent(t).normalized();
+            float x = (float) (getTestPoint(t).x + ((-1.5 + lane) * laneWidth * tangent.y));
+            float y = (float) (getTestPoint(t).y - ((-1.5 + lane) * laneWidth * tangent.x));
             Vector lanePoint = new Vector(x,y,1);
             return lanePoint;
         } else {
-            return Vector.O; // <- code goes here
+            t *= 3;
+            Vector[] c = controlPoints;
+
+            int n = 0;
+            while(n + 3 <= controlPoints.length){
+                t -= getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
+                if( t < 0 ){
+                    break;
+                }
+                
+                n += 3;
+                if (n > controlPoints.length - 3){
+                    n = 0;
+                }
+            }
+            
+            double index = -t/getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
+            Vector v = getCubicBezierPoint(index, c[n], c[n+1], c[n+2], c[n+3]);
+            Vector tangent = getCubicBezierTangent(index, c[n], c[n+1], c[n+2], c[n+3]);
+            
+            tangent = tangent.normalized();
+//            tangent.scale(-1);
+            
+            v.x += tangent.y * laneWidth * (-1.5 + lane);
+            v.y -= tangent.x * laneWidth * (-1.5 + lane);
+            
+            v = v.add(new Vector(0, 0, 1));
+            
+            return v;
         }
     }
     
@@ -149,9 +183,27 @@ class RaceTrack {
      */
     public Vector getLaneTangent(int lane, double t) {
         if (null == controlPoints) {
-            return getTestTangent(t);
+            return getTestTangent(t*0.03);
         } else {
-            return Vector.O; // <- code goes here
+            t *= 3;
+            Vector[] c = controlPoints;
+
+            int n = 0;
+            while(n + 3 <= controlPoints.length){
+                t -= getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
+                if( t < 0 ){
+                    break;
+                }
+                
+                n += 3;
+                if (n > controlPoints.length - 3){
+                    n = 0;
+                }
+            }
+            
+            double index = -t/getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
+            Vector v = getCubicBezierTangent(index, c[n], c[n+1], c[n+2], c[n+3]);
+            return v;
         }
     }
 
@@ -169,10 +221,46 @@ class RaceTrack {
      * Returns a tangent on the test track at 0 <= t < 1.
      */
     private Vector getTestTangent(double t) {
-        double tangentX = -20*PI*sin(PI*2*t)/sqrt(pow(-20*PI*sin(PI*2*t),2)+pow(28*PI*cos(PI*2*t),2));
-        double tangentY = 28*PI*cos(PI*2*t)/sqrt(pow(-20*PI*sin(PI*2*t),2)+pow(28*PI*cos(PI*2*t),2));
+        double tangentX = -20*PI*sin(PI*2*t);
+        double tangentY = 28*PI*cos(PI*2*t);
         Vector tangent = new Vector(tangentX,tangentY,0);
         return tangent;
+    }
+    
+    /**
+     * returns the point on the track after distance t
+     * @param t
+     * @return 
+     */
+    private Vector getPoint(double t){
+        if (controlPoints == null){
+            return getTestPoint(t);
+        }
+        return null;
+    }
+    
+    /**
+     * Returns the tangent of the track after distance t
+     * @param t
+     * @return 
+     */
+    private Vector getTangent(double t){
+        return null;
+    }
+    
+    /**
+     * Returns distance of the curve.
+     */
+    private double getSegmentLength(Vector P0, Vector P1,
+                           Vector P2, Vector P3){
+        double out = 0;
+        for (double i = 0.0; i <= 1.0; i += 0.05){
+            Vector t = getCubicBezierTangent(i, P0, P1,
+                                                P2, P3);
+            out += t.length() * 0.05;
+        }
+        
+        return out;
     }
     
     /**
@@ -215,6 +303,6 @@ class RaceTrack {
         sum = sum.add(c1);
         sum = sum.add(c2);
         sum = sum.add(c3);
-        return sum.normalized();    
+        return sum.scale(-1);
     }
 }

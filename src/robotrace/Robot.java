@@ -15,14 +15,17 @@ import static robotrace.Base.torso;
 * Represents a Robot, to be implemented according to the Assignments.
 */
 class Robot {
-    
     /** The position of the robot. */
     public Vector position = new Vector(0, 0, 0);
     
     /** The direction in which the robot is running. */
     public Vector direction = new Vector(1, 0, 0);
-
+    
+    /** Are we a stick figure? */
     public boolean isStickFigure = false;
+    
+    /** How far we've traversed the track so far */
+    public float distanceTravelled = 0.0f;
     
     /** The material from which this robot is built. */
     private final Material material;

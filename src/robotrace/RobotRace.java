@@ -190,6 +190,7 @@ public class RobotRace extends Base {
         
         // Update the view according to the camera mode and robot of interest.
         // For camera modes 1 to 4, determine which robot to focus on.
+        camera.raceTrack = raceTracks[gs.trackNr];
         camera.update(gs, robots[0]);
         glu.gluLookAt(camera.eye.x(),    camera.eye.y(),    camera.eye.z(),
                       camera.center.x(), camera.center.y(), camera.center.z(),
@@ -242,11 +243,8 @@ public class RobotRace extends Base {
         gl.glDisable(GL_COLOR_MATERIAL);                                        // Disable Color Material
 
         
-        // Get the position and direction of the first robot.
-        robots[0].position = raceTracks[gs.trackNr].getLanePoint(0, 0);
-        robots[0].direction = raceTracks[gs.trackNr].getLaneTangent(0, 0);
-        
-        double t = gs.tAnim * 0.03;
+        // Get the position and direction of the robots.
+        double t = gs.tAnim;
         
         for (int i=0; i < robots.length; i++){
             robots[i].position = raceTracks[gs.trackNr].getLanePoint(i, t);
