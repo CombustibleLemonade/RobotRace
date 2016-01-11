@@ -47,6 +47,7 @@ class Camera {
                 // Get the leading robot
                 maxDTravel = 0.0;
                 for (Robot i : robots){
+                    if (i == null){break;}
                     if (i.distanceTravelled > maxDTravel){
                         focus = i;
                         maxDTravel = i.distanceTravelled;
@@ -61,6 +62,7 @@ class Camera {
                 // Get the losing robot
                 maxDTravel = robots[0].distanceTravelled;
                 for (Robot i : robots){
+                    if (i == null){break;}
                     if (i.distanceTravelled <= maxDTravel){
                         focus = i;
                         maxDTravel = i.distanceTravelled;
