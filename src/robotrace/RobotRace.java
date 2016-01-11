@@ -157,7 +157,19 @@ public class RobotRace extends Base {
         
         // Custom track
         raceTracks[4] = new RaceTrack(new Vector[] { 
-           /* add control points */
+            new Vector(-2.5, -10, 0), // New segment: straight
+            new Vector(-2.5, -5, 0),
+            new Vector(-2.5, 5, 0),
+            new Vector(-2.5, 10, 0), // New segment: cap
+            new Vector(-2.5, 14, 0),
+            new Vector(2.5, 14, 0),
+            new Vector(2.5, 10, 0), // New segment: straight
+            new Vector(2.5, 5, 0),
+            new Vector(2.5, -5, 0),
+            new Vector(2.5, -10, 0), // New segment: cap
+            new Vector(2.5, -14, 0),
+            new Vector(-2.5, -14, 0),
+            new Vector(-2.5, -10, 0),        
         });
         
         // Initialize the terrain

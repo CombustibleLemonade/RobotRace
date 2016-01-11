@@ -65,9 +65,8 @@ class RaceTrack {
             }
             gl.glColor3f(0, 0, 0);
             gl.glEnd();
+            
             brick.bind(gl);
-            brick.setTexParameteri(gl, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            brick.setTexParameteri(gl, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
             brick.setTexParameteri(gl, GL_TEXTURE_WRAP_S, GL_REPEAT);
             brick.setTexParameteri(gl, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -104,7 +103,6 @@ class RaceTrack {
         } else {
             // draw the spline track
             gl.glBegin(GL2.GL_QUAD_STRIP);
-            
             int n = 0;
             while(n + 3 <= controlPoints.length){
                 Vector[] c = controlPoints;
@@ -123,11 +121,58 @@ class RaceTrack {
                     gl.glVertex3f(x1,y1,1);
                     gl.glTexCoord2f(1,0);
                     gl.glVertex3f(x2,y2,1);
-                }
+                }                
                 n += 3;
             }
+            gl.glEnd();
             
-            gl.glColor3f(0, 0, 0);
+            
+            brick.bind(gl);
+            gl.glColor3d(0.0, 0.0, 0.0);
+            // Draws outer wall
+            gl.glBegin(GL2.GL_QUAD_STRIP);
+            n = 0;
+            while (n + 3 <= controlPoints.length) {
+                Vector[] c = controlPoints;
+                
+                for(double i = 0; i<1.01; i+=0.01){
+                    Vector t = getCubicBezierTangent(i, c[n], c[n+1], c[n+2], c[n+3]).normalized();
+                    Vector p = getCubicBezierPoint(i, c[n], c[n+1], c[n+2], c[n+3]);
+                    float x2 = (float) (p.x + (2 * laneWidth * t.y));
+                    float y2 = (float) (p.y - (2 * laneWidth * t.x));
+                    
+                    gl.glNormal3d(t.y, -t.x, 0);
+                    gl.glTexCoord2f((float)(i*60),0.0f);
+                    gl.glVertex3f(x2,y2,1);
+                    gl.glTexCoord2f((float)(i*60),8.0f);
+                    gl.glVertex3f(x2,y2,-1);
+                }
+                
+                n += 3;
+            }
+            gl.glEnd();
+            
+            // Draws inner wall
+            gl.glBegin(GL2.GL_QUAD_STRIP);
+            n = 0;
+            while (n + 3 <= controlPoints.length) {
+                Vector[] c = controlPoints;
+                
+                for(double i = 0; i<1.01; i+=0.01){
+                    Vector t = getCubicBezierTangent(i, c[n], c[n+1], c[n+2], c[n+3]).normalized();
+                    Vector p = getCubicBezierPoint(i, c[n], c[n+1], c[n+2], c[n+3]);
+                    float x2 = (float) (p.x - (2 * laneWidth * t.y));
+                    float y2 = (float) (p.y + (2 * laneWidth * t.x));
+                    
+                    gl.glNormal3d(-t.y, t.x, 0);
+                    gl.glTexCoord2f((float)(i*60),0.0f);
+                    gl.glVertex3f(x2,y2,1);
+                    gl.glTexCoord2f((float)(i*60),8.0f);
+                    gl.glVertex3f(x2,y2,-1);
+                }
+                
+                n += 3;
+            }
             gl.glEnd();
         }
     }
@@ -184,9 +229,10 @@ class RaceTrack {
         if (null == controlPoints) {
             return getTestTangent(t*0.03);
         } else {
-            t *= 3;
+            t *= 3; // correction for robot running speed
             Vector[] c = controlPoints;
 
+            // First we determine what control sequence we need to use
             int n = 0;
             while(n + 3 <= controlPoints.length){
                 t -= getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
@@ -200,7 +246,8 @@ class RaceTrack {
                 }
             }
             
-            double index = 1+t/getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
+            // Then we get the tangent for that control sequence.
+            double index = 1 + t/getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
             Vector v = getCubicBezierTangent(index, c[n], c[n+1], c[n+2], c[n+3]);
             return v;
         }
