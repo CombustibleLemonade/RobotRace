@@ -83,10 +83,11 @@ class Robot {
         gl.glRotatef(-10, 0.0f, 1.0f, 0.0f); // Make arms point slightly outwards
         if (isStickFigure){
             glut.glutSolidSphere(stickJointSize, 10, 10);
-            gl.glRotated(180.0, 1.0, 0.0, 0.0);
+            gl.glRotated(180.0 + 50 * Math.sin(tAnim * 5), 1.0, 0.0, 0.0);
             gl.glScaled(stickThickness, stickThickness, 0.7);
             glut.glutSolidCylinder(1.0, 1.0, 10, 10);
         } else {
+            gl.glRotated(50 * Math.sin(tAnim * 5), 1.0, 0.0, 0.0);
             gl.glTranslatef(0.0f, 0.0f, -0.3f); // Go down a bit
             gl.glScalef(0.2f, 0.2f, 0.7f); // Scale the cubes to become long
             glut.glutSolidCube(1.0f);
@@ -279,7 +280,8 @@ class Robot {
         gl.glTranslatef(0.0f, 0.0f, 1.6f);
         drawArm(gl, glu, glut, tAnim);
         gl.glScalef(-1.0f, 1.0f, 1.0f);
-        drawArm(gl, glu, glut, tAnim);
+        drawArm(gl, glu, glut, tAnim - (float)Math.PI);
+        
         if (isStickFigure){
             gl.glTranslated(armXOffset, 0.0, 0.0);
             gl.glRotated(-90.0, 0.0, 1.0, 0.0);
