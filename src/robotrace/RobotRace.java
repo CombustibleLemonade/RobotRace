@@ -100,11 +100,6 @@ public class RobotRace extends Base {
         
         // O-track
         raceTracks[1] = new RaceTrack(new Vector[] {
-            /* add control points like:
-            new Vector(10, 0, 1), new Vector(10, 5, 1), new Vector(5, 10, 1),
-            new Vector(..., ..., ...), ...
-            */
-            // TODO
             new Vector(-10, 0, 0),
             new Vector(-10, -10, 0),
             new Vector(10, -10, 0),
@@ -116,12 +111,48 @@ public class RobotRace extends Base {
         
         // L-track
         raceTracks[2] = new RaceTrack(new Vector[] { 
-            /* add control points */
+            new Vector(10, -6, 0), // New segment: vertical_left
+            new Vector(10, -2, 0),
+            new Vector(10, 4, 0),
+            new Vector(10, 10, 0), // New segment: bottom_right_outer_corner
+            new Vector(10, 12, 0),
+            new Vector(9, 13, 0), 
+            new Vector(7, 13, 0), // New segment: horizontal_bottom
+            new Vector(3, 13.01, 0),
+            new Vector(-1, 13, 0), 
+            new Vector(-4, 12.98, 0), // New segment: right_end
+            new Vector(-8, 12.99, 0), 
+            new Vector(-8, 8, 0),
+            new Vector(-4, 8, 0), // New segment: horizontal_top
+            new Vector(-2, 8.01, 0),
+            new Vector(0, 7.99, 0),
+            new Vector(2, 8, 0), // New segment: bottom_right_inner_corner
+            new Vector(4, 8, 0),
+            new Vector(5, 7, 0),
+            new Vector(5, 5, 0), // New segment: vertical_right
+            new Vector(5, 2, 0), 
+            new Vector(5, -3, 0),
+            new Vector(5, -6, 0), // New segment: top_end
+            new Vector(5, -10, 0),
+            new Vector(10, -10, 0),
+            new Vector(10, -6, 0)
         });
         
         // C-track
         raceTracks[3] = new RaceTrack(new Vector[] { 
-            /* add control points */
+            new Vector(-13, 4, 0),// New segment: outer_c
+            new Vector(-13, -16, 0),
+            new Vector(13, -16, 0),
+            new Vector(13, 4, 0),// New segment: cap
+            new Vector(13, 8, 0),
+            new Vector(8, 8, 0),
+            new Vector(8, 4, 0), // New segment: inner_c
+            new Vector(8, -9, 0),
+            new Vector(-8, -9, 0),
+            new Vector(-8, 4, 0), // New segment: cap
+            new Vector(-8, 8, 0),
+            new Vector(-13, 8, 0),
+            new Vector(-13, 4, 0)
         });
         
         // Custom track

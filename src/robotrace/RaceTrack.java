@@ -161,12 +161,11 @@ class RaceTrack {
                 }
             }
             
-            double index = -t/getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
+            double index = 1 + t/getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
             Vector v = getCubicBezierPoint(index, c[n], c[n+1], c[n+2], c[n+3]);
             Vector tangent = getCubicBezierTangent(index, c[n], c[n+1], c[n+2], c[n+3]);
             
             tangent = tangent.normalized();
-//            tangent.scale(-1);
             
             v.x += tangent.y * laneWidth * (-1.5 + lane);
             v.y -= tangent.x * laneWidth * (-1.5 + lane);
@@ -201,7 +200,7 @@ class RaceTrack {
                 }
             }
             
-            double index = -t/getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
+            double index = 1+t/getSegmentLength(c[n], c[n+1], c[n+2], c[n+3]);
             Vector v = getCubicBezierTangent(index, c[n], c[n+1], c[n+2], c[n+3]);
             return v;
         }
@@ -225,27 +224,6 @@ class RaceTrack {
         double tangentY = 28*PI*cos(PI*2*t);
         Vector tangent = new Vector(tangentX,tangentY,0);
         return tangent;
-    }
-    
-    /**
-     * returns the point on the track after distance t
-     * @param t
-     * @return 
-     */
-    private Vector getPoint(double t){
-        if (controlPoints == null){
-            return getTestPoint(t);
-        }
-        return null;
-    }
-    
-    /**
-     * Returns the tangent of the track after distance t
-     * @param t
-     * @return 
-     */
-    private Vector getTangent(double t){
-        return null;
     }
     
     /**
@@ -293,7 +271,7 @@ class RaceTrack {
         // This basically is the gradient of the getCubicBezierPoint method
         // C0-3 are the coefficients, and derivatives of getCubicBezierPoint coefficients
         Vector c0 = P0.scale(-3 * Math.pow(1-t, 2)); //
-        Vector c1 = P1.scale(3 * Math.pow(1-t, 2) - 3 * t * (1-t));
+        Vector c1 = P1.scale(3 * Math.pow(1-t, 2) - 6 * t * (1-t));
         Vector c2 = P2.scale(6 * t * (1-t) - 3 * t * t);
         Vector c3 = P3.scale(3 * t * t);
 
@@ -303,6 +281,6 @@ class RaceTrack {
         sum = sum.add(c1);
         sum = sum.add(c2);
         sum = sum.add(c3);
-        return sum.scale(-1);
+        return sum;
     }
 }
