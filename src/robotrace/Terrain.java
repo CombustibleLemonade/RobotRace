@@ -297,7 +297,9 @@ class Terrain {
     public void drawTree(GL2 gl, GLU glu, GLUT glut, int depth, float diam, float length){
         if(depth>0){
             //Set color and draw branch then translate to the end of last branch
-            gl.glColor3f(83/255,48/255,24/255);
+            gl.glDisable(GL_TEXTURE_2D);
+            
+            gl.glColor3d(83.0/255.0, 48.0/255.0, 24.0/255.0);
             glut.glutSolidCylinder(diam/2, length, 20, 10);
             gl.glTranslatef( 0.0f, 0.0f, length );
 
