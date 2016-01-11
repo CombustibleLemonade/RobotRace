@@ -16,6 +16,14 @@ import javax.media.opengl.glu.GLU;
  */
 class Terrain {
     
+    float[] lengthDiamDiff;
+    float[] angle;
+    float initDiam;
+    float initLength;
+    int initDepth;
+    int num;
+    int num2;
+            
     Random r = new Random();
     ByteBuffer bb;
     int gensize = (int)(pow(2,8) + 1);
@@ -29,6 +37,23 @@ class Terrain {
      * Can be used to set up a display list.
      */
     public Terrain() {
+        initDiam = (max(0.7f,r.nextFloat()));
+        initLength = 3f*(max(0.8f,r.nextFloat()));
+        initDepth = 6+(r.nextInt(5));
+        angle = new float[initDepth *2];
+        for(int i=0; i<angle.length;i++){
+            num = (r.nextInt(170));
+            num2 = (r.nextInt(1));
+            if(num2<1){
+                num = num*-1;
+            }
+            angle[i] = num;
+        }
+        lengthDiamDiff = new float[initDepth*2];
+        for(int i=0; i<lengthDiamDiff.length;i++){
+            lengthDiamDiff[i] = max(0.7f,r.nextFloat());
+        }
+        
         Color colors[] = new Color[16];
         int terrainTexColors[] = {
             43, 79, 105,
@@ -119,14 +144,20 @@ class Terrain {
         gl.glPushMatrix();
         gl.glBegin(GL2.GL_QUADS);
         gl.glNormal3f(0,0,1);
-        gl.glVertex3f(-21,-21,0);
-        gl.glVertex3f(-21,21,0);
-        gl.glVertex3f(21,21,0);
-        gl.glVertex3f(21,-21,0);
+        gl.glVertex3f(-20,-20,0);
+        gl.glVertex3f(-20,20,0);
+        gl.glVertex3f(20,20,0);
+        gl.glVertex3f(20,-20,0);
         gl.glEnd();
         gl.glPopMatrix();
         gl.glDisable(GL_BLEND);
         
+        gl.glColor3f(0,0,0);
+        gl.glPushMatrix();
+        gl.glTranslatef(-19.5f,-19.5f,0);
+        gl.glRotatef(60f,0.0f,0.0f,1.0f);
+        drawTree(gl,glu,glut,initDepth,initDiam,initLength);
+        gl.glPopMatrix();
         gl.glDisable(GL_COLOR_MATERIAL);
     }
 
@@ -141,7 +172,7 @@ class Terrain {
 
     public float[][] generate() {
         // Place initial seeds for corners
-        map[0][0] = r.nextFloat()*2;
+        map[0][0] = 1.65f;
         map[0][map.length - 1] = r.nextFloat()*2;
         map[map.length - 1][0] = r.nextFloat()*2;
         map[map.length - 1][map.length - 1] = r.nextFloat()*2;
@@ -261,5 +292,41 @@ class Terrain {
 
     private float randVariance(float v){
         return (float) (r.nextFloat()*2*v - v);
+    }
+    
+    public void drawTree(GL2 gl, GLU glu, GLUT glut, int depth, float diam, float length){
+        if(depth>0){
+            //Set color and draw branch then translate to the end of last branch
+            gl.glColor3f(83/255,48/255,24/255);
+            glut.glutSolidCylinder(diam/2, length, 20, 10);
+            gl.glTranslatef( 0.0f, 0.0f, length );
+
+            
+            if(depth ==1){
+            gl.glColor3f(71/255,144/255,0);
+            gl.glRotatef(45f,1.0f,1.0f,0.0f);
+            gl.glBegin(GL2.GL_POLYGON);
+            gl.glNormal3f(0,0,1);
+            gl.glVertex3f(0.0f,0.0f,0.0f);
+            gl.glVertex3f(-0.3f,0.4f,0.0f);
+            gl.glVertex3f(0.05f,0.6f,0.0f);
+            gl.glVertex3f(0.3f,0.35f,0.0f);
+            gl.glEnd();
+            }
+            length = (float) (length*lengthDiamDiff[depth-1]);
+            diam = (float) (diam*lengthDiamDiff[initDepth+depth-1]);
+            
+            
+
+            
+            gl.glPushMatrix();
+            gl.glRotatef(angle[(2*depth)-1], 0.3f,0.0f,0.5f);
+            drawTree(gl,glu,glut,depth-1,diam,length);
+            gl.glPopMatrix();
+            gl.glPushMatrix();
+            gl.glRotatef(angle[(2*depth)-2], -0.7f,0.0f,-1.0f);
+            drawTree(gl,glu,glut,depth-1,diam,length);
+            gl.glPopMatrix();
+        }
     }
 }
